@@ -12,23 +12,22 @@ h3{ text-align:center; }
    width:350px;
 }
 
-p{
+textarea{
    box-sizing:border-box;
    background:#FFF;
    display:block;
-   border:1px solid rgba(0, 0, 0, 0.1);
    border-radius:4px;
    height:100%;
    width:100%;
-   border:none;
    margin:0;
    resize:none;
    padding:10px;
    outline:none;
-   border:3px solid #222;
    color:rgba(0, 0, 0, 0.9);
+   font-size:16px;
+   border:3px solid transparent;
 }
-p:focus{
+textarea:focus{
    border:3px solid rgba(0, 0, 0, 0.25);
 }
 
@@ -37,6 +36,34 @@ p:focus{
    display:block;
    width:100%;
    height:100%;
+}
+
+.mention-wrapper textarea {
+   color:rgba(0, 0, 0, 0.1);
+}
+
+.mention-display {
+   position:absolute;
+   display:inline-block;
+   box-sizing:border-box;
+   background:rgba(0, 0, 0, 0.1);
+   pointer-events:none;
+   width:100%;
+   height:100%;
+   top:0px;
+   left:0px;
+   border-radius:4px;
+   word-break:break-word;
+   -moz-appearance: textfield-multiline;
+    -webkit-appearance: textarea;
+    font: medium -moz-fixed;
+    font: -webkit-small-control;
+   // Matching Textarea
+
+   border:3px solid transparent;
+   padding:10px;
+   font-size:16px;
+   color:red;
 }
 
 .mention-options {
