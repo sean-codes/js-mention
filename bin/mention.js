@@ -11,6 +11,7 @@ function Mention(settings) {
          that.updateDisplay()
          that.setCursorPosition()
          that.locateInputData()
+         that.optionsSearch()
 
          that.inputData.word.length ? that.showOptions() : that.hideOptions()
 
@@ -59,6 +60,13 @@ function Mention(settings) {
       this.html.display.innerHTML = storeText
    }
 
+   this.optionsSearch = function() {
+      for(var option of this.html.options) {
+         console.log(this.inputData.word.length)
+         option.classList.toggle('show', (!this.inputData.word.length || option.innerHTML.startsWith(this.inputData.word)) ? true : false)
+      }
+   }
+
    this.locateInputData = function() {
       var endPosition = this.cursorPosition
       var startPosition = this.cursorPosition
@@ -75,23 +83,25 @@ function Mention(settings) {
       this.inputData = {
          start: startPosition,
          end: this.cursorPosition,
-         word: this.html.input.value.substring(startPosition, this.cursorPositon)
+         word: this.html.input.value.substring(startPosition+1, this.cursorPositon)
       }
       console.log(this.inputData)
    }
 
    this.showOptions = function() {
-      console.log('Show Options')
       this.html.optionsList.classList.add('show')
    }
    this.hideOptions = function() {
-      console.log('Hide Options')
       this.html.optionsList.classList.remove('show')
    }
    this.selectOption = function(data) {
-      console.log('Selecting Data')
-      console.log(data)
-      console.log(this.locateTag())
+      this.html.input.value =
+         this.html.input.value.substring(0, this.inputData.start) +
+         '@' + data +
+         this.html.input.value.substring(this.inputData.end, this.html.input.value.length) + ' '
+      this.updateDisplay()
+      this.hideOptions()
+      this.html.input.focus()
    }
 
    var that = this

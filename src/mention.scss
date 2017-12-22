@@ -43,10 +43,10 @@ textarea:focus{
 }
 
 .mention-display {
+   color:rgba(0, 0, 0, 0.9);
    position:absolute;
    display:inline-block;
    box-sizing:border-box;
-   background:rgba(0, 0, 0, 0.1);
    pointer-events:none;
    width:100%;
    height:100%;
@@ -55,15 +55,14 @@ textarea:focus{
    border-radius:4px;
    word-break:break-word;
    -moz-appearance: textfield-multiline;
-    -webkit-appearance: textarea;
-    font: medium -moz-fixed;
-    font: -webkit-small-control;
+   -webkit-appearance: textarea;
+   font: medium -moz-fixed;
+   font: -webkit-small-control;
    // Matching Textarea
 
    border:3px solid transparent;
    padding:10px;
    font-size:16px;
-   color:red;
 }
 
 .mention-options {
@@ -86,6 +85,7 @@ textarea:focus{
    background:#FFF;
    position:relative;
    cursor:pointer;
+   display:none;
 }
 .mention-options .mention-option:hover:after,
 .mention-options .mention-option.active:after {
@@ -96,4 +96,8 @@ textarea:focus{
    background:rgba(0, 0, 0, 0.1);
    pointer-events:none;
    cursor:pointer;
+}
+
+.mention-options .mention-option.show {
+   display:block;
 }
