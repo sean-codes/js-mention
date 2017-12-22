@@ -62,8 +62,7 @@ function Mention(settings) {
 
    this.optionsSearch = function() {
       for(var option of this.html.options) {
-         console.log(this.inputData.word.length)
-         option.classList.toggle('show', (!this.inputData.word.length || option.innerHTML.startsWith(this.inputData.word)) ? true : false)
+         option.classList.toggle('show', (!this.inputData.word.length || option.innerHTML.startsWith(this.inputData.word.replace('@', ''))) ? true : false)
       }
    }
 
@@ -83,7 +82,7 @@ function Mention(settings) {
       this.inputData = {
          start: startPosition,
          end: this.cursorPosition,
-         word: this.html.input.value.substring(startPosition+1, this.cursorPositon)
+         word: this.html.input.value.substring(startPosition, this.cursorPositon)
       }
       console.log(this.inputData)
    }
