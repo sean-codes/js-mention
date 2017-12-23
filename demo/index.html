@@ -1,14 +1,89 @@
 <!doctype html>
 <html>
    <head>
-      <link rel="stylesheet" href="../bin/mention.css"
+      <link rel="stylesheet" href="../bin/mention.css">
+      <!-- User Styles -->
+      <style>
+         html, body{
+            padding:0px;
+            margin:0px;
+            background:#222;
+            font-family: 'Karla', sans-serif;
+            color:#FFF;
+         }
+         h3{ text-align:center; }
+         .demo{
+            display:flex;
+            max-width:600px;
+            margin:auto;
+         }
+         .container{
+            margin:20px auto;
+            height:80px;
+            flex:1;
+         }
+         #data {
+            background:transparent;
+            border:none;
+            display:block;
+            max-width:350px;
+            width:100%;
+            height:400px;
+            color:#FFF;
+            flex:1;
+            padding:20px;
+         }
+
+         .mention-wrapper textarea,
+         .mention-wrapper .mention-display{
+            box-sizing:border-box;
+            background:#FFF;
+            display:block;
+            border-radius:4px;
+            height:100%;
+            width:100%;
+            margin:0;
+            resize:none;
+            padding:10px;
+            outline:none;
+            color:rgba(0, 0, 0, 0.9);
+            font-size:16px;
+            border:3px solid transparent;
+         }
+         .mention-wrapper textarea:focus{
+            border:3px solid rgba(0, 0, 0, 0.25);
+         }
+
+      </style>
    </head>
    <body>
       <h3>@ Input</h3>
-      <div class="container">
-         <textarea></textarea>
-      </div>
-
+      <div class="demo">
+         <div class="container">
+            <textarea></textarea>
+         </div>
+         <textarea id="data"></textarea>
+      </demo>
       <script src="../bin/mention.js"></script>
+      <script>
+         var myMention = new Mention({
+            selector: 'textarea',
+            options: [
+               { id: 2, name: 'WideEye', description: 'Wideeye Potion' },
+               { id: 100, name: 'LiquidLuck', description: 'Felix Felicis' },
+               { id: 10, name: 'PolyJuice', description: 'Polyjuice Potion' }
+            ],
+            update: function() {
+               document.querySelector('#data').innerHTML = JSON.stringify(this.collect(), null, '\t')
+            },
+            match: function(word, option) {
+               return option.name.startsWith(word)
+                  || option.description.toLowerCase().indexOf(word.toLowerCase()) >= 0
+            },
+            template: function(option) {
+               return '@' + option.name + ' [' + option.description + ']'
+            }
+         })
+      </script>
    </body>
 </html>
