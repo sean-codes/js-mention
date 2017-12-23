@@ -3,7 +3,8 @@
 
 ![example](https://github.com/sean-codes/js-mention/blob/master/js-mention.gif?raw=true)
 
-Demo: [demo](https://sean-codes.github.io/js-mention/demo/index.html)
+Demo: [demo](https://sean-codes.github.io/js-mention/demo/)
+
 
 ## Include:
 ```html
