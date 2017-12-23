@@ -1,47 +1,18 @@
-html, body {
-  padding: 0px;
-  margin: 0px;
-  background: #222;
-  font-family: 'Karla', sans-serif;
-  color: #FFF; }
-
-h3 {
-  text-align: center; }
-
-.container {
-  margin: 20px auto;
-  height: 80px;
-  width: 350px; }
-
-textarea {
-  box-sizing: border-box;
-  background: #FFF;
-  display: block;
-  border-radius: 4px;
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  resize: none;
-  padding: 10px;
-  outline: none;
-  color: rgba(0, 0, 0, 0.9);
-  font-size: 16px;
-  border: 3px solid transparent; }
-
-textarea:focus {
-  border: 3px solid rgba(0, 0, 0, 0.25); }
-
 .mention-wrapper {
   position: relative;
   display: block;
   width: 100%;
-  height: 100%; }
+  height: 100%;
+  box-sizing: border-box; }
 
 .mention-wrapper textarea {
-  color: rgba(0, 0, 0, 0.1); }
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%; }
 
 .mention-display {
-  color: rgba(0, 0, 0, 0.9);
+  background: transparent !important;
+  overflow: hidden;
   position: absolute;
   display: inline-block;
   box-sizing: border-box;
@@ -50,15 +21,12 @@ textarea:focus {
   height: 100%;
   top: 0px;
   left: 0px;
-  border-radius: 4px;
   word-break: break-word;
   -moz-appearance: textfield-multiline;
   -webkit-appearance: textarea;
   font: medium -moz-fixed;
   font: -webkit-small-control;
-  border: 3px solid transparent;
-  padding: 10px;
-  font-size: 16px; }
+  border: 3px solid transparent; }
 
 .mention-options {
   position: absolute;
@@ -68,10 +36,9 @@ textarea:focus {
   width: 100%;
   border: 3px solid transparent;
   box-sizing: border-box; }
-
-.mention-options.show {
-  pointer-events: initial;
-  opacity: 1; }
+  .mention-options.show {
+    pointer-events: initial;
+    opacity: 1; }
 
 .mention-options .mention-option {
   padding: 5px 10px;
@@ -79,6 +46,9 @@ textarea:focus {
   position: relative;
   cursor: pointer;
   display: none; }
+  .mention-options .mention-option.hover {
+    background: #AAA;
+    color: #FFF; }
 
 .mention-options .mention-option:hover:after,
 .mention-options .mention-option.active:after {
