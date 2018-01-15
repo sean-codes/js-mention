@@ -43,14 +43,16 @@ var Mention = function () {
    }, {
       key: 'listen',
       value: function listen() {
+         var _this = this;
+
          var that = this;
          this.html.input.addEventListener('input', function (e) {
-            that.updateDisplay();
-            that.cursorPosition = that.html.input.selectionStart;
-            that.locateInputData();
-            that.optionsMatch();
-
-            that.inputData.word.length ? that.showOptions() : that.hideOptions();
+            _this.updateDisplay();
+            _this.cursorPosition = _this.html.input.selectionStart;
+            _this.inputData = _this.locateInputData({ cursorPosition: _this.cursorPosition, value: _this.input.value });
+            console.log(_this.inputData);
+            _this.optionsMatch();
+            _this.inputData.word.length ? _this.showOptions() : _this.hideOptions();
          });
 
          var _iteratorNormalCompletion = true;
@@ -148,6 +150,7 @@ var Mention = function () {
       key: 'updateDisplay',
       value: function updateDisplay() {
          var storeText = this.html.input.value.replace(/\r?\n/g, '<br/>');
+         var storeText = this.html.input.value.replace(' ', '&nbsp;');
          var _iteratorNormalCompletion3 = true;
          var _didIteratorError3 = false;
          var _iteratorError3 = undefined;
@@ -189,25 +192,21 @@ var Mention = function () {
       }
    }, {
       key: 'locateInputData',
-      value: function locateInputData() {
-         var endPosition = this.cursorPosition;
-         var startPosition = this.cursorPosition;
-         var valueWithReplacedSpecial = JSON.stringify(this.html.input.value).replace("\\n", ' ');
+      value: function locateInputData(data) {
+         var startPosition = data.cursorPosition;
+         var valueWithReplacedSpecial = data.value.replace(/\n/g, " ");
 
-         while (endPosition--) {
-            startPosition = endPosition;
-            var previousCharacter = valueWithReplacedSpecial[endPosition];
-            if (previousCharacter == ' ') break;
-            if (previousCharacter == '@' && (endPosition - 1 <= 0 || this.html.input.value[endPosition - 1] == ' ')) break;
+         while (startPosition--) {
+            var previousCharacter = valueWithReplacedSpecial[startPosition];
+            if (previousCharacter == ' ' || previousCharacter == '@') break;
          }
 
-         if (this.html.input.value[startPosition] != '@') startPosition = this.cursorPosition;
-         this.inputData = {
+         if (previousCharacter != '@') return { start: data.cursorPosition, end: data.cursorPosition, word: '' };
+         return {
             start: startPosition,
-            end: this.cursorPosition,
-            word: this.html.input.value.substring(startPosition, this.cursorPositon)
+            end: data.cursorPosition,
+            word: valueWithReplacedSpecial.substring(startPosition, data.cursorPosition)
          };
-         console.log(this.inputData);
       }
    }, {
       key: 'showOptions',

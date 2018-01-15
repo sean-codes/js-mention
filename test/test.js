@@ -28,9 +28,27 @@ tape('HTML is setup', (test) => {
    test.end()
 })
 
-tape('@key causes options to display', (test) => {
-   textarea.value = '@'
-   
-   test.pass('yay!')
+tape('locate input data', (test) => {
+   input = { value: '@awd', cursorPosition: 4 }
+   output = { word: '@awd', start: 0, end: 4 }
+   test.deepEqual(mention.locateInputData(input), output, 'Basic locate Input data')
+
+   input = { value: '@awd @', cursorPosition: 4 }
+   output = { word: '@awd', start: 0, end: 4 }
+   test.deepEqual(mention.locateInputData(input), output, 'Basic locate input date with @ after')
+
+   input = { value: '@awd\n', cursorPosition: 5 }
+   output = { word: '', start: 5, end: 5 }
+   test.deepEqual(mention.locateInputData(input), output, 'Locate input data with enter')
+
+   input = { value: '@awd \n@', cursorPosition: 7 }
+   output = { word: '@', start: 6, end: 7 }
+   test.deepEqual(mention.locateInputData(input), output, 'Locate input data with enter and @ after')
+
+   input = { value: '@awd @', cursorPosition: 6 }
+   output = { word: '@', start: 5, end: 6 }
+   test.deepEqual(mention.locateInputData(input), output, 'Locate input data with space and @ after')
+
+
    test.end()
 })

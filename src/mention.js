@@ -32,13 +32,13 @@ class Mention {
 
    listen() {
       var that = this
-      this.html.input.addEventListener('input', function(e) {
-         that.updateDisplay()
-         that.cursorPosition = that.html.input.selectionStart
-         that.locateInputData()
-         that.optionsMatch()
-
-         that.inputData.word.length ? that.showOptions() : that.hideOptions()
+      this.html.input.addEventListener('input', (e) => {
+         this.updateDisplay()
+         this.cursorPosition = this.html.input.selectionStart
+         this.inputData = this.locateInputData({ cursorPosition: this.cursorPosition, value: this.input.value })
+         console.log(this.inputData)
+         this.optionsMatch()
+         this.inputData.word.length ? this.showOptions() : this.hideOptions()
       })
 
       for(var optionElement of this.html.options) {
@@ -90,6 +90,7 @@ class Mention {
 
    updateDisplay() {
       var storeText = this.html.input.value.replace(/\r?\n/g, '<br/>')
+      var storeText = this.html.input.value.replace(' ', '&nbsp;')
       for(var option of this.options) {
          var optionHTML = document.createElement('u')
          optionHTML.innerHTML = this.key + option.name
@@ -107,25 +108,21 @@ class Mention {
       }
    }
 
-   locateInputData() {
-      var endPosition = this.cursorPosition
-      var startPosition = this.cursorPosition
-      var valueWithReplacedSpecial = JSON.stringify(this.html.input.value).replace("\\n", ' ')
+   locateInputData(data) {
+      var startPosition = data.cursorPosition
+      var valueWithReplacedSpecial = data.value.replace(/\n/g, " ");
 
-      while(endPosition--){
-         startPosition = endPosition
-         var previousCharacter = valueWithReplacedSpecial[endPosition]
-         if(previousCharacter == ' ') break
-         if(previousCharacter == '@' && (endPosition-1 <= 0 || this.html.input.value[endPosition-1] == ' ')) break
+      while(startPosition--){
+         var previousCharacter = valueWithReplacedSpecial[startPosition]
+         if(previousCharacter == ' ' || previousCharacter == '@') break
       }
 
-      if(this.html.input.value[startPosition] != '@') startPosition = this.cursorPosition
-         this.inputData = {
-            start: startPosition,
-            end: this.cursorPosition,
-            word: this.html.input.value.substring(startPosition, this.cursorPositon)
-         }
-      console.log(this.inputData)
+      if(previousCharacter != '@') return { start: data.cursorPosition, end: data.cursorPosition, word: ''}
+      return {
+         start: startPosition,
+         end: data.cursorPosition,
+         word: valueWithReplacedSpecial.substring(startPosition, data.cursorPosition)
+      }
    }
 
    showOptions() {
