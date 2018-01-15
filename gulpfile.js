@@ -1,11 +1,14 @@
 var gulp = require('gulp')
 var sass = require('gulp-sass')
-var run = require('tape-run');
 var browserify = require('browserify');
 var tapSpec = require('tap-spec');
+var run = require('tape-run');
+var babel = require("gulp-babel");
 
+// Defauklt / Watch
+gulp.task('default', ['css', 'js', 'test'])
 gulp.task('watch', function() {
-   gulp.watch('./src/**/*', ['css', 'js'])
+   gulp.watch(['./src/**/*', './test/test.js'], ['default'])
 })
 
 gulp.task('css', function() {
@@ -16,6 +19,7 @@ gulp.task('css', function() {
 
 gulp.task('js', function() {
    return gulp.src('./src/**/*.js')
+      .pipe(babel())
       .pipe(gulp.dest('./bin'))
 })
 

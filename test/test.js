@@ -1,6 +1,36 @@
-tape = require('tape')
+var tape = require('tape')
+var Mention = require('../src/mention.js')
 
-tape('Demo', (test) => {
+// Create HTML
+var textarea = document.createElement('textarea')
+document.body.appendChild(textarea)
+
+//Settings
+var settings = {
+   input: textarea,
+   options: ['one', 'two', 'three']
+}
+
+//Create mention
+var mention = new Mention(settings)
+
+tape('HTML is setup', (test) => {
+   test.ok(mention.html.input, 'Input exists')
+   test.ok(mention.html.wrapper, 'Wrapper exists')
+   test.ok(mention.html.display, 'Display exists')
+   test.ok(mention.html.optionsList, 'Options exist')
+   test.equal(mention.html.input.parentElement, mention.html.wrapper, 'Input inside wrapper')
+   test.equal(mention.html.display.parentElement, mention.html.wrapper, 'Display inside wrapper')
+   test.equal(mention.html.options.filter((e, i) => {
+      return e.innerHTML == settings.options[i]
+   }).length, 3, 'Options match settings')
+
+   test.end()
+})
+
+tape('@key causes options to display', (test) => {
+   textarea.value = '@'
+   
    test.pass('yay!')
    test.end()
 })

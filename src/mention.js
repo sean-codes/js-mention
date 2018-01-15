@@ -1,10 +1,40 @@
-function Mention(settings) {
-   this.listen = function() {
-      this.html.input.addEventListener('input', function(e) {
+class Mention {
+   constructor(settings) {
+      var that = this
+      this.options = settings.options || []
+      this.input = settings.input
+      this.key = settings.key || '@'
+      this.cursorPosition = 0
+      this.hover = 0
+      this.showingOptions = false
+      this.upDownStay = 0
+      this.update = settings.update || function(){}
+      this.match = settings.match || this.defaultMatchFunction
+      this.template = settings.template || this.defaultTemplate
+      this.html = {
+         input: undefined,
+         display: undefined,
+         wrapper: undefined,
+         optionsList: undefined,
+         options: [],
+         spans: [] }
+      this.setupHTML()
+      this.listen()
+   }
 
-         // Update carret Position
+   defaultMatchFunction(word, option) {
+      return (!word.length || option.name.startsWith(word.replace('@', '')))
+   }
+
+   defaultTemplate(option) {
+      return option.name || option
+   }
+
+   listen() {
+      var that = this
+      this.html.input.addEventListener('input', function(e) {
          that.updateDisplay()
-         that.setCursorPosition()
+         that.cursorPosition = that.html.input.selectionStart
          that.locateInputData()
          that.optionsMatch()
 
@@ -34,8 +64,8 @@ function Mention(settings) {
       })
    }
 
-   this.setupHTML = function() {
-      this.html.input = document.querySelector(settings.selector)
+   setupHTML() {
+      this.html.input = this.input
       this.html.wrapper = document.createElement('div')
       this.html.wrapper.classList.add('mention-wrapper')
       this.html.display = document.createElement('div')
@@ -58,71 +88,59 @@ function Mention(settings) {
       }
    }
 
-   this.setCursorPosition = function() {
-      this.cursorPosition = this.html.input.selectionStart
-   }
-
-   this.updateDisplay = function() {
+   updateDisplay() {
       var storeText = this.html.input.value.replace(/\r?\n/g, '<br/>')
       for(var option of this.options) {
          var optionHTML = document.createElement('u')
          optionHTML.innerHTML = this.key + option.name
          optionHTML.setAttribute('mentiondata', JSON.stringify(option))
-         //optionHTML = '<u>@'+option+'</u>'
          storeText = storeText.replace(new RegExp('@'+option.name, 'g'), optionHTML.outerHTML)
       }
       this.html.display.innerHTML = storeText
-      that.update()
+      this.update()
    }
 
-   this.optionsMatch = function() {
+   optionsMatch() {
       for(var option in this.options) {
          var word = this.inputData.word.replace('@', '')
          this.html.options[option].classList.toggle('show', this.match(word, this.options[option]))
       }
    }
 
-   this.defaultMatchFunction = function(word, option) {
-      return (!word.length || option.name.startsWith(word.replace('@', '')))
-   }
-   this.defaultTemplate = function(option) {
-      return option.name
-   }
-
-   this.locateInputData = function() {
+   locateInputData() {
       var endPosition = this.cursorPosition
       var startPosition = this.cursorPosition
+      var valueWithReplacedSpecial = JSON.stringify(this.html.input.value).replace("\\n", ' ')
+
       while(endPosition--){
          startPosition = endPosition
-         previousCharacter = that.html.input.value[endPosition]
-         var breakCharacters = [' ', '\n']
-         if(breakCharacters.some(function(e) { return previousCharacter == e })) break
-         if((previousCharacter == '@')
-         && (endPosition-1 <= 0 || that.html.input.value[endPosition-1] == ' ')) {
-            break
+         var previousCharacter = valueWithReplacedSpecial[endPosition]
+         if(previousCharacter == ' ') break
+         if(previousCharacter == '@' && (endPosition-1 <= 0 || this.html.input.value[endPosition-1] == ' ')) break
+      }
+
+      if(this.html.input.value[startPosition] != '@') startPosition = this.cursorPosition
+         this.inputData = {
+            start: startPosition,
+            end: this.cursorPosition,
+            word: this.html.input.value.substring(startPosition, this.cursorPositon)
          }
-      }
-      if(that.html.input.value[startPosition] != '@') startPosition = this.cursorPosition
-      this.inputData = {
-         start: startPosition,
-         end: this.cursorPosition,
-         word: this.html.input.value.substring(startPosition, this.cursorPositon)
-      }
       console.log(this.inputData)
    }
 
-   this.showOptions = function() {
+   showOptions() {
       console.log('Show options')
       this.html.options[0].classList.add
       this.html.optionsList.classList.add('show')
       this.showingOptions = true
    }
-   this.hideOptions = function() {
+   hideOptions() {
       console.log('Hide options')
       this.html.optionsList.classList.remove('show')
       this.showingOptions = false
    }
-   this.selectOption = function(optionHTML) {
+
+   selectOption(optionHTML) {
       console.log(optionHTML)
       var data = JSON.parse(optionHTML.getAttribute('mentiondata')).name
       this.html.input.value =
@@ -133,7 +151,8 @@ function Mention(settings) {
       this.hideOptions()
       this.html.input.focus()
    }
-   this.setHoverOption = function() {
+
+   setHoverOption() {
       var viewableOptions = this.html.options.filter(function(e){ return e.classList.contains('show') })
       if(!viewableOptions.length) return
       for(var option of this.html.options) {
@@ -144,7 +163,8 @@ function Mention(settings) {
       if(this.hover == viewableOptions.length) { this.hover = 0}
       viewableOptions[this.hover].classList.add('hover')
    }
-   this.collect = function() {
+
+   collect() {
       var data = []
       var added = this.html.display.querySelectorAll('u')
       for(var add of added) {
@@ -152,25 +172,6 @@ function Mention(settings) {
       }
       return data
    }
-
-   var that = this
-   this.options = settings.options || []
-   this.selector = settings.selector
-   this.key = settings.key || '@'
-   this.cursorPosition = 0
-   this.hover = 0
-   this.showingOptions = false
-   this.upDownStay = 0
-   this.update = settings.update || function(){}
-   this.match = settings.match || this.defaultMatchFunction
-   this.template = settings.template || this.defaultTemplateFunction
-   this.html = {
-      input: undefined,
-      display: undefined,
-      wrapper: undefined,
-      optionsList: undefined,
-      options: [],
-      spans: [] }
-   this.setupHTML()
-   this.listen()
 }
+
+if(typeof module != 'undefined') module.exports = Mention
