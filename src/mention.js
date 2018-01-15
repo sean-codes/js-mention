@@ -36,7 +36,6 @@ class Mention {
          this.updateDisplay()
          this.cursorPosition = this.html.input.selectionStart
          this.inputData = this.locateInputData({ cursorPosition: this.cursorPosition, value: this.input.value })
-         console.log(this.inputData)
          this.optionsMatch()
          this.inputData.word.length ? this.showOptions() : this.hideOptions()
       })
@@ -126,19 +125,16 @@ class Mention {
    }
 
    showOptions() {
-      console.log('Show options')
       this.html.options[0].classList.add
       this.html.optionsList.classList.add('show')
       this.showingOptions = true
    }
    hideOptions() {
-      console.log('Hide options')
       this.html.optionsList.classList.remove('show')
       this.showingOptions = false
    }
 
    selectOption(optionHTML) {
-      console.log(optionHTML)
       var data = JSON.parse(optionHTML.getAttribute('mentiondata')).name
       this.html.input.value =
          this.html.input.value.substring(0, this.inputData.start) +
