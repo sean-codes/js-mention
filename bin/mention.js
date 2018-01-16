@@ -50,9 +50,8 @@ var Mention = function () {
             _this.updateDisplay();
             _this.cursorPosition = _this.html.input.selectionStart;
             _this.inputData = _this.locateInputData({ cursorPosition: _this.cursorPosition, value: _this.input.value });
-            console.log(_this.inputData);
             _this.optionsMatch();
-            _this.inputData.word.length ? _this.showOptions() : _this.hideOptions();
+            _this.toggleOptions(_this.inputData.word.length);
          });
 
          var _iteratorNormalCompletion = true;
@@ -96,6 +95,7 @@ var Mention = function () {
                }));
             }
          });
+
          this.html.input.addEventListener('keyup', function (e) {
             that.setHoverOption();
          });
@@ -209,24 +209,14 @@ var Mention = function () {
          };
       }
    }, {
-      key: 'showOptions',
-      value: function showOptions() {
-         console.log('Show options');
-         this.html.options[0].classList.add;
-         this.html.optionsList.classList.add('show');
-         this.showingOptions = true;
-      }
-   }, {
-      key: 'hideOptions',
-      value: function hideOptions() {
-         console.log('Hide options');
-         this.html.optionsList.classList.remove('show');
-         this.showingOptions = false;
+      key: 'toggleOptions',
+      value: function toggleOptions(toggle) {
+         this.html.optionsList.classList.toggle('show', toggle);
+         this.showingOptions = toggle;
       }
    }, {
       key: 'selectOption',
       value: function selectOption(optionHTML) {
-         console.log(optionHTML);
          var data = JSON.parse(optionHTML.getAttribute('mentiondata')).name;
          this.html.input.value = this.html.input.value.substring(0, this.inputData.start) + '@' + data + this.html.input.value.substring(this.inputData.end, this.html.input.value.length) + ' ';
          this.updateDisplay();

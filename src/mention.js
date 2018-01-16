@@ -37,7 +37,7 @@ class Mention {
          this.cursorPosition = this.html.input.selectionStart
          this.inputData = this.locateInputData({ cursorPosition: this.cursorPosition, value: this.input.value })
          this.optionsMatch()
-         this.inputData.word.length ? this.showOptions() : this.hideOptions()
+         this.toggleOptions(this.inputData.word.length)
       })
 
       for(var optionElement of this.html.options) {
@@ -58,6 +58,7 @@ class Mention {
             that.selectOption(that.html.options.find(function(e) { return e.classList.contains('hover') }))
          }
       })
+
       this.html.input.addEventListener('keyup', function(e) {
          that.setHoverOption()
       })
@@ -124,14 +125,9 @@ class Mention {
       }
    }
 
-   showOptions() {
-      this.html.options[0].classList.add
-      this.html.optionsList.classList.add('show')
-      this.showingOptions = true
-   }
-   hideOptions() {
-      this.html.optionsList.classList.remove('show')
-      this.showingOptions = false
+   toggleOptions(toggle) {
+      this.html.optionsList.classList.toggle('show', toggle)
+      this.showingOptions = toggle
    }
 
    selectOption(optionHTML) {

@@ -28,7 +28,7 @@ tape('HTML is setup', (test) => {
    test.end()
 })
 
-tape('locate input data', (test) => {
+tape('Input Data can be Located', (test) => {
    input = { value: '@awd', cursorPosition: 4 }
    output = { word: '@awd', start: 0, end: 4 }
    test.deepEqual(mention.locateInputData(input), output, 'Basic locate Input data')
@@ -49,6 +49,10 @@ tape('locate input data', (test) => {
    output = { word: '@', start: 5, end: 6 }
    test.deepEqual(mention.locateInputData(input), output, 'Locate input data with space and @ after')
 
+   test.end()
+})
+
+tape('Display follows input on scroll', (test) => {
 
    test.end()
 })
