@@ -52,6 +52,11 @@ tape('Input Data can be Located', (test) => {
    test.end()
 })
 
+tape('Cursor moves. Toggle options open/closed', (test) => {
+	
+   test.end()
+})
+
 tape('Display follows input on scroll', (test) => {
 
    test.end()
