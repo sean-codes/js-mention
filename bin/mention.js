@@ -88,17 +88,23 @@ var Mention = function () {
          this.html.wrapper.appendChild(this.html.input);
          this.html.wrapper.appendChild(this.html.display);
 
-         // Duplicated the styles
-         this.html.display.style.cssText = document.defaultView.getComputedStyle(this.html.input, "").cssText;
-         //this.html.display.style.paddingBottom = '2em'
-         //this.html.display.style.overflow = 'hidden'
-
+         // Duplicate the styles ( absolutly unacceptable )
          this.html.display.style.pointerEvents = "none";
-         this.html.display.style.background = "transparent";
          this.html.display.style.position = "absolute";
          this.html.display.style.overflow = "auto";
-         this.html.display.style.left = '0px';
-         this.html.display.style.top = '0px';
+         var computedStyleInput = window.getComputedStyle(this.html.input, null);
+         var borderWidth = parseInt(computedStyleInput.getPropertyValue('border-width'));
+         var left = borderWidth + parseInt(computedStyleInput.getPropertyValue('padding-left'));
+         var top = borderWidth + parseInt(computedStyleInput.getPropertyValue('padding-top'));
+         if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            left += 3;
+         } // Mobile safari hack
+         this.html.display.style.color = computedStyleInput.getPropertyValue('color');
+         this.html.display.style.fontSize = computedStyleInput.getPropertyValue('font-family');
+         this.html.display.style.fontFamily = computedStyleInput.getPropertyValue('font-size');
+         this.html.display.style.left = left + 'px';
+         this.html.display.style.top = top + 'px';
+         this.html.input.style.color = 'transparent';
 
          this.html.optionsList = document.createElement('div');
          this.html.optionsList.classList.add('mention-options');
