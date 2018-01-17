@@ -71,20 +71,22 @@ class Mention {
       this.html.wrapper.appendChild(this.html.display)
 
       // Duplicate the styles ( absolutly unacceptable )
-      this.html.display.style.pointerEvents = "none"
-      this.html.display.style.position = "absolute"
-      this.html.display.style.overflow = "auto"
 		var computedStyleInput = window.getComputedStyle(this.html.input, null)
 		var borderWidth = parseInt(computedStyleInput.getPropertyValue('border-width'))
-		var left = borderWidth + parseInt(computedStyleInput.getPropertyValue('padding-left'))
-		var top = borderWidth + parseInt(computedStyleInput.getPropertyValue('padding-top'))
-		if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){ left += 3; } // Mobile safari hack
+		if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){ borderWidth += 3; } // Mobile safari hack
 		this.html.display.style.color = computedStyleInput.getPropertyValue('color')
 		this.html.display.style.fontSize = computedStyleInput.getPropertyValue('font-family')
 		this.html.display.style.fontFamily = computedStyleInput.getPropertyValue('font-size')
-      this.html.display.style.left = left + 'px'
-      this.html.display.style.top = top + 'px'
-		this.html.input.style.color = 'transparent'
+      this.html.display.style.padding = parseInt(computedStyleInput.getPropertyValue('padding')) + borderWidth + 'px'
+		this.html.display.style.pointerEvents = 'none'
+		this.html.display.style.color = 'transparent'
+		this.html.display.style.position = 'absolute'
+		this.html.display.style.overflow = 'hidden'
+		this.html.display.style.overflow = "auto"
+		this.html.display.style.height = '100%'
+		this.html.display.style.width = '100%'
+		this.html.display.style.left = '0px'
+		this.html.display.style.top = '0px'
 
       this.html.optionsList = document.createElement('div')
       this.html.optionsList.classList.add('mention-options')
