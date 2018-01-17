@@ -11,10 +11,10 @@ var settings = {
    options: ['one', 'two', 'three']
 }
 
-//Create mention
-var mention = new Mention(settings)
-
 tape('HTML is setup', (test) => {
+   //Create mention
+   var mention = new Mention(settings)
+
    test.ok(mention.html.input, 'Input exists')
    test.ok(mention.html.wrapper, 'Wrapper exists')
    test.ok(mention.html.display, 'Display exists')
@@ -29,6 +29,8 @@ tape('HTML is setup', (test) => {
 })
 
 tape('Input Data can be Located', (test) => {
+   var mention = new Mention(settings)
+
    input = { value: '@awd', cursorPosition: 4 }
    output = { word: '@awd', start: 0, end: 4 }
    test.deepEqual(mention.locateInputData(input), output, 'Basic locate Input data')
@@ -47,13 +49,31 @@ tape('Input Data can be Located', (test) => {
 
    input = { value: '@awd @', cursorPosition: 6 }
    output = { word: '@', start: 5, end: 6 }
-   test.deepEqual(mention.locateInputData(input), output, 'Locate input data with space and @ after')
+   test.deepEqual(mention.locateInp-utData(input), output, 'Locate input data with space and @ after')
+
+   input = { value: '@awd', cursorPosition: 3 }
+   output = { word: '@aw', start: 0, end: 4 }
+   test.deepEqual(mention.locateInputData(input), output, 'Cursor within input value. Moves end around the word ex. @a|wda')
 
    test.end()
 })
 
 tape('Cursor moves. Toggle options open/closed', (test) => {
-	
+   var mention = new Mention(settings)
+
+   mention.input.value = '@one'
+   mention.input.focus()
+   mention.cursorPositionChanged()
+
+   test.equal(mention.cursorPosition, 4, 'cursor position is moved')
+   test.ok(mention.showingOptions, '@ symbol in word. Options are shown')
+
+   mention.input.value = 'one'
+   mention.input.focus()
+   mention.cursorPositionChanged()
+
+   test.equal(mention.cursorPosition, 3, 'cursor position is moved')
+   test.notOk(mention.showingOptions, 'no @ symbol in word. Options are shown')
    test.end()
 })
 
