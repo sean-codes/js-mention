@@ -29,6 +29,7 @@ tape('HTML is setup', (test) => {
 })
 
 tape('Input Data can be Located', (test) => {
+   //Create mention
    var mention = new Mention(settings)
 
    input = { value: '@awd', cursorPosition: 4 }
@@ -49,7 +50,7 @@ tape('Input Data can be Located', (test) => {
 
    input = { value: '@awd @', cursorPosition: 6 }
    output = { word: '@', start: 5, end: 6 }
-   test.deepEqual(mention.locateInp-utData(input), output, 'Locate input data with space and @ after')
+   test.deepEqual(mention.locateInputData(input), output, 'Locate input data with space and @ after')
 
    input = { value: '@awd', cursorPosition: 3 }
    output = { word: '@aw', start: 0, end: 4 }
@@ -59,6 +60,7 @@ tape('Input Data can be Located', (test) => {
 })
 
 tape('Cursor moves. Toggle options open/closed', (test) => {
+   //Create mention
    var mention = new Mention(settings)
 
    mention.input.value = '@one'

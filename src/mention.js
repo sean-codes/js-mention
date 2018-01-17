@@ -61,11 +61,26 @@ class Mention {
       this.html.input = this.input
       this.html.wrapper = document.createElement('div')
       this.html.wrapper.classList.add('mention-wrapper')
+      this.html.wrapper.style.position = 'relative'
+      this.html.wrapper.style.width = '100%'
+      this.html.wrapper.style.height = '100%'
       this.html.display = document.createElement('div')
       this.html.display.classList.add('mention-display')
       this.html.input.parentElement.insertBefore(this.html.wrapper, this.html.input)
       this.html.wrapper.appendChild(this.html.input)
       this.html.wrapper.appendChild(this.html.display)
+
+      // Duplicated the styles
+      this.html.display.style.cssText = document.defaultView.getComputedStyle(this.html.input, "").cssText;
+      //this.html.display.style.paddingBottom = '2em'
+      //this.html.display.style.overflow = 'hidden'
+
+      this.html.display.style.pointerEvents = "none"
+      this.html.display.style.background = "transparent"
+      this.html.display.style.position = "absolute"
+      this.html.display.style.overflow = "auto"
+      this.html.display.style.left = '0px'
+      this.html.display.style.top = '0px'
 
       this.html.optionsList = document.createElement('div')
       this.html.optionsList.classList.add('mention-options')
@@ -143,6 +158,7 @@ class Mention {
    */
    onEventScroll() {
       this.html.display.scrollTop = this.html.input.scrollTop
+      //myMention.html.display.style.top = -myMention.html.input.scrollTop + 'px'
    }
 
    /**

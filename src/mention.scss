@@ -1,36 +1,3 @@
-.mention-wrapper {
-   position:relative;
-   display:block;
-   width:100%;
-   height:100%;
-   box-sizing:border-box;
-}
-
-.mention-wrapper textarea {
-   box-sizing:border-box;
-   width:100%;
-   height:100%;
-}
-
-.mention-display {
-   background:transparent!important;
-   overflow:hidden;
-   position:absolute;
-   display:inline-block;
-   box-sizing:border-box;
-   pointer-events:none;
-   width:100%;
-   height:100%;
-   top:0px;
-   left:0px;
-   word-break:break-word;
-   -moz-appearance: textfield-multiline;
-   -webkit-appearance: textarea;
-   font: medium -moz-fixed;
-   font: -webkit-small-control;
-   border:3px solid transparent;
-}
-
 .mention-options {
    position:absolute;
    pointer-events:none;
