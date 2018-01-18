@@ -4,7 +4,7 @@ var browserify = require('browserify');
 var tapSpec = require('tap-spec');
 var run = require('tape-run');
 var babel = require("gulp-babel");
-
+var concat = require('gulp-concat')
 // Defauklt / Watch
 gulp.task('default', ['css', 'js', 'test'])
 gulp.task('watch', function() {
@@ -18,7 +18,8 @@ gulp.task('css', function() {
 })
 
 gulp.task('js', function() {
-   return gulp.src('./src/**/*.js')
+   return gulp.src(['./src/**/*.js', './node_modules/babel-polyfill/dist/polyfill.min.js'])
+      .pipe(concat('mention.js'))
       .pipe(babel())
       .pipe(gulp.dest('./bin'))
 })

@@ -59,11 +59,12 @@ class Mention {
 	*/
 	setupHTML() {
       this.html.input = this.input
+      var computedStyleInput = window.getComputedStyle(this.html.input, null)
       this.html.wrapper = document.createElement('div')
       this.html.wrapper.classList.add('mention-wrapper')
       this.html.wrapper.style.position = 'relative'
-      this.html.wrapper.style.width = '100%'
-      this.html.wrapper.style.height = '100%'
+      this.html.wrapper.style.width = computedStyleInput.getPropertyValue('width')
+
       this.html.display = document.createElement('div')
       this.html.display.classList.add('mention-display')
       this.html.input.parentElement.insertBefore(this.html.wrapper, this.html.input)
@@ -71,22 +72,29 @@ class Mention {
       this.html.wrapper.appendChild(this.html.display)
 
       // Duplicate the styles ( absolutly unacceptable )
-		var computedStyleInput = window.getComputedStyle(this.html.input, null)
-		var borderWidth = parseInt(computedStyleInput.getPropertyValue('border-width'))
-		if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){ borderWidth += 3; } // Mobile safari hack
-		this.html.display.style.color = computedStyleInput.getPropertyValue('color')
-		this.html.display.style.fontSize = computedStyleInput.getPropertyValue('font-family')
-		this.html.display.style.fontFamily = computedStyleInput.getPropertyValue('font-size')
-      this.html.display.style.padding = parseInt(computedStyleInput.getPropertyValue('padding')) + borderWidth + 'px'
-		this.html.display.style.pointerEvents = 'none'
-		this.html.display.style.color = 'transparent'
-		this.html.display.style.position = 'absolute'
-		this.html.display.style.overflow = 'hidden'
-		this.html.display.style.overflow = "auto"
-		this.html.display.style.height = '100%'
-		this.html.display.style.width = '100%'
-		this.html.display.style.left = '0px'
-		this.html.display.style.top = '0px'
+		this.html.display.style.color = computedStyleInput.color
+		this.html.display.style.fontSize = computedStyleInput.fontSize
+		this.html.display.style.fontFamily = computedStyleInput.fontFamily
+      this.html.display.style.padding = computedStyleInput.paddingTop + ' ' + computedStyleInput.paddingLeft
+      this.html.display.style.borderTopWidth = computedStyleInput.borderTopWidth
+      this.html.display.style.borderBottomWidth = computedStyleInput.borderBottomWidth
+      this.html.display.style.borderRightWidth = computedStyleInput.borderRightWidth
+      this.html.display.style.borderLeftWidth = computedStyleInput.borderLeftWidth
+      this.html.display.style.borderStyle = computedStyleInput.borderTopStyle
+      this.html.display.style.wordBreak = computedStyleInput.wordBreak
+      this.html.display.style.borderColor = 'transparent'
+      if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){
+         this.html.display.style.paddingLeft = parseInt(computedStyleInput.getPropertyValue('padding-left')) + 3 + 'px'
+      }
+      this.html.display.style.boxSizing = computedStyleInput.getPropertyValue('box-sizing')
+      this.html.display.style.pointerEvents = "none"
+      this.html.display.style.position = "absolute"
+      this.html.display.style.left = '0px'
+      this.html.display.style.top = '0px'
+      this.html.display.style.width = '100%';
+      this.html.input.style.width = '100%'
+      this.html.display.style.overflow = 'hidden'
+      this.html.input.style.overflow = 'hidden'
 
       this.html.optionsList = document.createElement('div')
       this.html.optionsList.classList.add('mention-options')
@@ -110,7 +118,6 @@ class Mention {
       this.html.input.addEventListener('input', () => { this.onEventInput() })
       this.html.input.addEventListener('keydown', (e) => { this.onEventKeyDown(e) })
       this.html.input.addEventListener('keyup', (e) => { this.onEventKeyUp(e) })
-      this.html.input.addEventListener('scroll', () => { this.onEventScroll() })
       this.html.options.forEach((o) => { o.addEventListener('click', (e) => { this.onEventOptionClick(e.target) }) })
    }
 
@@ -148,13 +155,11 @@ class Mention {
 	* Called when option input.addEventListener('click')
 	*/
    onEventOptionClick(optionEle) {
-      var data = JSON.parse(optionEle.getAttribute('mentiondata')).name
-      this.html.input.value =
-         this.html.input.value.substring(0, this.inputData.start) +
-         '@' + data +
-         this.html.input.value.substring(this.inputData.end, this.html.input.value.length) + ' '
+      var word = JSON.parse(optionEle.getAttribute('mentiondata')).name
+      this.html.input.value = this.html.input.value.substring(0, this.inputData.start) + '@' + word
+         + this.html.input.value.substring(this.inputData.end, this.html.input.value.length) + ' '
       this.html.input.focus()
-      this.cursorPosition = this.html.input.selectionStart
+      this.setCursorPosition(this.html.input.value.length + word.length)
       this.updateDisplay()
       this.toggleOptions(false)
    }
@@ -163,7 +168,9 @@ class Mention {
    * Called when on input.addEventListener('scroll')
    */
    onEventScroll() {
-      this.html.display.scrollTop = this.html.input.scrollTop
+      this.html.display.style.height = this.html.display.scrollHeight + 'px'
+      this.html.input.style.height = this.html.input.scrollHeight + 'px'
+      //this.html.display.scrollTop = this.html.input.scrollTop
       //myMention.html.display.style.top = -myMention.html.input.scrollTop + 'px'
    }
 
@@ -181,7 +188,8 @@ class Mention {
 	* Updates the display (finds mentions and underlines/bolds them)
 	*/
    updateDisplay() {
-      var storeText = this.html.input.value.replace(/\r?\n/g, '<br/>').replace(' ', '&nbsp;')
+      var storeText = this.html.input.value.replace(/\r?\n/g, ' <br/>').replace(/ /g, '&nbsp;')
+      if(storeText[storeText.length-1] == '>') { storeText+= '&nbsp;' } // Fixes scroll height
       for(var option of this.options) {
          var optionHTML = document.createElement('u')
          optionHTML.innerHTML = this.symbol + (option.name || option)
@@ -189,6 +197,8 @@ class Mention {
          storeText = storeText.replace(new RegExp('@'+option.name, 'g'), optionHTML.outerHTML)
       }
       this.html.display.innerHTML = storeText
+      this.html.display.style.height = this.html.display.scrollHeight + 'px'
+      this.html.input.style.height = this.html.input.scrollHeight + 'px'
       this.update()
    }
 
@@ -202,7 +212,6 @@ class Mention {
       var endPosition = data.cursorPosition
       var startPosition = data.cursorPosition
       var valueWithReplacedSpecial = data.value.replace(/\n/g, " ");
-
       while(startPosition--){
          var previousCharacter = valueWithReplacedSpecial[startPosition]
          if(previousCharacter == ' ' || previousCharacter == '@') break
@@ -227,7 +236,8 @@ class Mention {
 	* @param {Boolean} toggle - show or hide
 	*/
 	toggleOptions(toggle) {
-      this.html.optionsList.classList.toggle('show', toggle)
+      this.html.optionsList.classList.remove('show')
+      if(toggle) this.html.optionsList.classList.add('show')
       this.showingOptions = toggle
    }
 
@@ -237,7 +247,8 @@ class Mention {
 	optionsMatch() {
       for(var option in this.options) {
          var word = this.inputData.word.replace('@', '')
-         this.html.options[option].classList.toggle('show', this.match(word, this.options[option]))
+         this.html.options[option].classList.remove('show')
+         if(this.match(word, this.options[option])) this.html.options[option].classList.add('show', )
       }
    }
 
@@ -273,6 +284,15 @@ class Mention {
 	*/
    deconctruct() {
 
+   }
+
+   /**
+   * Sets the cursor position in the text area
+   * @param {Number} position - the position
+   */
+   setCursorPosition(position) {
+      this.cursorPosition = position
+      this.html.input.setSelectionRange(position, position);
    }
 }
 
