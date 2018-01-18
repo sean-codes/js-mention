@@ -60,13 +60,10 @@ class Mention {
 	setupHTML() {
       this.html.input = this.input
       var computedStyleInput = window.getComputedStyle(this.html.input, null)
-
       this.html.wrapper = document.createElement('div')
       this.html.wrapper.classList.add('mention-wrapper')
       this.html.wrapper.style.position = 'relative'
       this.html.wrapper.style.width = computedStyleInput.getPropertyValue('width')
-      this.html.wrapper.style.height = '100%'
-
 
       this.html.display = document.createElement('div')
       this.html.display.classList.add('mention-display')
@@ -75,24 +72,29 @@ class Mention {
       this.html.wrapper.appendChild(this.html.display)
 
       // Duplicate the styles ( absolutly unacceptable )
-		this.html.display.style.color = computedStyleInput.getPropertyValue('color')
-		this.html.display.style.fontSize = computedStyleInput.getPropertyValue('font-family')
-		this.html.display.style.fontFamily = computedStyleInput.getPropertyValue('font-size')
-      this.html.display.style.padding = computedStyleInput.getPropertyValue('padding')
-      this.html.display.style.border = computedStyleInput.getPropertyValue('border')
+		this.html.display.style.color = computedStyleInput.color
+		this.html.display.style.fontSize = computedStyleInput.fontSize
+		this.html.display.style.fontFamily = computedStyleInput.fontFamily
+      this.html.display.style.padding = computedStyleInput.paddingTop + ' ' + computedStyleInput.paddingLeft
+      this.html.display.style.borderTopWidth = computedStyleInput.borderTopWidth
+      this.html.display.style.borderBottomWidth = computedStyleInput.borderBottomWidth
+      this.html.display.style.borderRightWidth = computedStyleInput.borderRightWidth
+      this.html.display.style.borderLeftWidth = computedStyleInput.borderLeftWidth
+      this.html.display.style.borderStyle = computedStyleInput.borderTopStyle
+      this.html.display.style.wordBreak = computedStyleInput.wordBreak
+      this.html.display.style.borderColor = 'transparent'
       if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){
-         //this.html.display.style.borderTopWidth = parseInt(computedStyleInput.getPropertyValue('border-top-width')) + 3 + 'px'
          this.html.display.style.paddingLeft = parseInt(computedStyleInput.getPropertyValue('padding-left')) + 3 + 'px'
       }
       this.html.display.style.boxSizing = computedStyleInput.getPropertyValue('box-sizing')
       this.html.display.style.pointerEvents = "none"
       this.html.display.style.position = "absolute"
-      this.html.display.style.overflow = "hidden"
       this.html.display.style.left = '0px'
       this.html.display.style.top = '0px'
       this.html.display.style.width = '100%';
-      this.html.display.style.height = '100%';
       this.html.input.style.width = '100%'
+      this.html.display.style.overflow = 'hidden'
+      this.html.input.style.overflow = 'hidden'
 
       this.html.optionsList = document.createElement('div')
       this.html.optionsList.classList.add('mention-options')
@@ -116,7 +118,6 @@ class Mention {
       this.html.input.addEventListener('input', () => { this.onEventInput() })
       this.html.input.addEventListener('keydown', (e) => { this.onEventKeyDown(e) })
       this.html.input.addEventListener('keyup', (e) => { this.onEventKeyUp(e) })
-      this.html.input.addEventListener('scroll', () => { this.onEventScroll() })
       this.html.options.forEach((o) => { o.addEventListener('click', (e) => { this.onEventOptionClick(e.target) }) })
    }
 
@@ -167,7 +168,9 @@ class Mention {
    * Called when on input.addEventListener('scroll')
    */
    onEventScroll() {
-      this.html.display.scrollTop = this.html.input.scrollTop
+      this.html.display.style.height = this.html.display.scrollHeight + 'px'
+      this.html.input.style.height = this.html.input.scrollHeight + 'px'
+      //this.html.display.scrollTop = this.html.input.scrollTop
       //myMention.html.display.style.top = -myMention.html.input.scrollTop + 'px'
    }
 
@@ -194,6 +197,8 @@ class Mention {
          storeText = storeText.replace(new RegExp('@'+option.name, 'g'), optionHTML.outerHTML)
       }
       this.html.display.innerHTML = storeText
+      this.html.display.style.height = this.html.display.scrollHeight + 'px'
+      this.html.input.style.height = this.html.input.scrollHeight + 'px'
       this.update()
    }
 
@@ -207,7 +212,6 @@ class Mention {
       var endPosition = data.cursorPosition
       var startPosition = data.cursorPosition
       var valueWithReplacedSpecial = data.value.replace(/\n/g, " ");
-
       while(startPosition--){
          var previousCharacter = valueWithReplacedSpecial[startPosition]
          if(previousCharacter == ' ' || previousCharacter == '@') break
@@ -232,7 +236,8 @@ class Mention {
 	* @param {Boolean} toggle - show or hide
 	*/
 	toggleOptions(toggle) {
-      this.html.optionsList.classList.toggle('show', toggle)
+      this.html.optionsList.classList.remove('show')
+      if(toggle) this.html.optionsList.classList.add('show')
       this.showingOptions = toggle
    }
 
@@ -242,7 +247,8 @@ class Mention {
 	optionsMatch() {
       for(var option in this.options) {
          var word = this.inputData.word.replace('@', '')
-         this.html.options[option].classList.toggle('show', this.match(word, this.options[option]))
+         this.html.options[option].classList.remove('show')
+         if(this.match(word, this.options[option])) this.html.options[option].classList.add('show', )
       }
    }
 
