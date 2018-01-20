@@ -90,14 +90,21 @@ var Mention = function () {
          this.html.wrapper.appendChild(this.html.input);
          this.html.wrapper.appendChild(this.html.display);
 
-         if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {}
-         //this.html.display.style.paddingLeft = parseInt(computedStyleInput.getPropertyValue('padding-left')) + 3 + 'px'
-
-         //this.html.display.style.cssText = computedStyleInput.cssText;
-         for (var i = 0; i < computedStyleInput.length; i++) {
-
-            this.html.display.style[computedStyleInput[i]] = computedStyleInput[computedStyleInput[i]];
+         for (var prop in computedStyleInput) {
+            try {
+               this.html.display.style[prop] = computedStyleInput[prop];
+            } catch (e) {
+               console.log(e);
+            }
          }
+         if (/iPhone|iPad|iPod|Edge/i.test(navigator.userAgent)) {
+            this.html.display.style.paddingLeft = parseInt(computedStyleInput.getPropertyValue('padding-left')) + 3 + 'px';
+            if (navigator.userAgent.includes('Edge')) {
+               this.html.display.style.paddingTop = parseInt(computedStyleInput.getPropertyValue('padding-top')) + 3 + 'px';
+            }
+         }
+         this.html.display.style.wordBreak = 'break-word';
+         this.html.display.style.wordWrap = 'break-word';
          this.html.display.style.background = 'transparent';
          this.html.display.style.pointerEvents = "none";
          this.html.display.style.position = "absolute";

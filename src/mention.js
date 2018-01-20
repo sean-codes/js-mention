@@ -58,7 +58,6 @@ class Mention {
 	* Sets up the HTML. Wrapper, Display, OptionsList, Options
 	*/
 	setupHTML() {
-      console.log('wtf')
       this.html.input = this.input
       var computedStyleInput = window.getComputedStyle(this.html.input, "")
       this.html.wrapper = document.createElement('div')
@@ -72,11 +71,17 @@ class Mention {
       this.html.wrapper.appendChild(this.html.input)
       this.html.wrapper.appendChild(this.html.display)
 
-
-      if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){
-         this.html.display.style.paddingLeft = parseInt(computedStyleInput.getPropertyValue('padding-left')) + 3 + 'px'
+      for(var prop in computedStyleInput){
+         try { this.html.display.style[prop] = computedStyleInput[prop] } catch(e) { console.log(e) }
       }
-      this.html.display.style.cssText = computedStyleInput.cssText;
+      if(/iPhone|iPad|iPod|Edge/i.test(navigator.userAgent)){
+         this.html.display.style.paddingLeft = parseInt(computedStyleInput.getPropertyValue('padding-left')) + 3 + 'px'
+         if(navigator.userAgent.includes('Edge')){
+            this.html.display.style.paddingTop = parseInt(computedStyleInput.getPropertyValue('padding-top')) + 3 + 'px'
+         }
+      }
+      this.html.display.style.wordBreak = 'break-word'
+      this.html.display.style.wordWrap = 'break-word'
       this.html.display.style.background = 'transparent';
       this.html.display.style.pointerEvents = "none"
       this.html.display.style.position = "absolute"
