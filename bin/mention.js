@@ -92,9 +92,7 @@ var Mention = function () {
          for (var prop in computedStyleInput) {
             try {
                this.html.display.style[prop] = computedStyleInput[prop];
-            } catch (e) {
-               console.log(e);
-            }
+            } catch (e) {}
          }
          if (/iPhone|iPad|iPod|Edge/i.test(navigator.userAgent)) {
             this.html.display.style.paddingLeft = parseInt(computedStyleInput.getPropertyValue('padding-left')) + 3 + 'px';
@@ -255,7 +253,9 @@ var Mention = function () {
 
          // Fix the html styles
          var computedStylesInput = window.getComputedStyle(this.html.input);
-         var minHeight = parseInt(computedStylesInput.getPropertyValue('height'));
+         var minHeight = parseInt(computedStylesInput.getPropertyValue('min-height'));
+         minHeight += parseInt(computedStylesInput.getPropertyValue('padding-bottom'));
+         minHeight += parseInt(computedStylesInput.getPropertyValue('border-width')) / 2;
          if (minHeight < this.html.display.offsetHeight) minHeight = this.html.display.offsetHeight;
          this.html.input.style.height = minHeight + 'px';
       }
