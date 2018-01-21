@@ -123,6 +123,7 @@ class Mention {
 	*/
 	onEventInput() {
 		this.updateDisplay()
+      this.update()
 	}
 
    /**
@@ -161,25 +162,13 @@ class Mention {
    }
 
    /**
-   * Called when on input.addEventListener('scroll')
-   */
-   onEventScroll() {
-      this.html.display.style.height = this.html.input.scrollHeight + 'px'
-      this.html.input.style.height = this.html.input.scrollHeight + 'px'
-      //this.html.display.scrollTop = this.html.input.scrollTop
-      //myMention.html.display.style.top = -myMention.html.input.scrollTop + 'px'
-   }
-
-   /**
    * Cursor position changed. Check for input data and toggle options
    */
    cursorPositionChanged() {
       this.cursorPosition = this.html.input.selectionStart
 		this.inputData = this.locateInputData({ cursorPosition: this.cursorPosition, value: this.input.value })
-      console.log(this.inputData)
       this.toggleOptions(this.inputData.word.length)
 		this.optionsMatch()
-      this.onEventScroll()
    }
 
 	/**
@@ -187,7 +176,7 @@ class Mention {
 	*/
    updateDisplay() {
       var storeText = this.html.input.value.replace(/\r?\n/g, ' <br/>').replace(/ /g, ' ')
-      //if(storeText[storeText.length-1] == '>') { storeText+= '&nbsp;' } // Fixes scroll height
+
       for(var option of this.options) {
          var optionHTML = document.createElement('u')
 
@@ -196,9 +185,13 @@ class Mention {
          storeText = storeText.replace(new RegExp('@'+option.name, 'g'), optionHTML.outerHTML)
       }
       this.html.display.innerHTML = storeText
-      this.html.display.style.height = this.html.display.scrollHeight + 'px'
-      this.html.input.style.height = this.html.input.scrollHeight + 'px'
-      this.update()
+
+      // HTML Fixes
+      var computedStyleInput = window.getComputedStyle(this.html.input, "")
+      var height = this.html.input.scrollHeight// + parseInt(computedStyleInput.getPropertyValue('padding-bottom'))
+      this.html.display.style.height = height + 'px'
+      this.html.input.style.height = height + 'px'
+      this.html.input.scrollTop = 0
    }
 
 	/**

@@ -76,7 +76,6 @@ var Mention = function () {
    }, {
       key: 'setupHTML',
       value: function setupHTML() {
-         console.log('wtf');
          this.html.input = this.input;
          var computedStyleInput = window.getComputedStyle(this.html.input, "");
          this.html.wrapper = document.createElement('div');
@@ -185,6 +184,7 @@ var Mention = function () {
       key: 'onEventInput',
       value: function onEventInput() {
          this.updateDisplay();
+         this.update();
       }
 
       /**
@@ -233,19 +233,6 @@ var Mention = function () {
       }
 
       /**
-      * Called when on input.addEventListener('scroll')
-      */
-
-   }, {
-      key: 'onEventScroll',
-      value: function onEventScroll() {
-         this.html.display.style.height = this.html.input.scrollHeight + 'px';
-         this.html.input.style.height = this.html.input.scrollHeight + 'px';
-         //this.html.display.scrollTop = this.html.input.scrollTop
-         //myMention.html.display.style.top = -myMention.html.input.scrollTop + 'px'
-      }
-
-      /**
       * Cursor position changed. Check for input data and toggle options
       */
 
@@ -254,10 +241,8 @@ var Mention = function () {
       value: function cursorPositionChanged() {
          this.cursorPosition = this.html.input.selectionStart;
          this.inputData = this.locateInputData({ cursorPosition: this.cursorPosition, value: this.input.value });
-         console.log(this.inputData);
          this.toggleOptions(this.inputData.word.length);
          this.optionsMatch();
-         this.onEventScroll();
       }
 
       /**
@@ -268,7 +253,7 @@ var Mention = function () {
       key: 'updateDisplay',
       value: function updateDisplay() {
          var storeText = this.html.input.value.replace(/\r?\n/g, ' <br/>').replace(/ /g, ' ');
-         //if(storeText[storeText.length-1] == '>') { storeText+= '&nbsp;' } // Fixes scroll height
+
          var _iteratorNormalCompletion2 = true;
          var _didIteratorError2 = false;
          var _iteratorError2 = undefined;
@@ -299,9 +284,13 @@ var Mention = function () {
          }
 
          this.html.display.innerHTML = storeText;
-         this.html.display.style.height = this.html.display.scrollHeight + 'px';
-         this.html.input.style.height = this.html.input.scrollHeight + 'px';
-         this.update();
+
+         // HTML Fixes
+         var computedStyleInput = window.getComputedStyle(this.html.input, "");
+         var height = this.html.input.scrollHeight; // + parseInt(computedStyleInput.getPropertyValue('padding-bottom'))
+         this.html.display.style.minHeight = height + 'px';
+         this.html.input.style.minHeight = height + 'px';
+         this.html.input.scrollTop = 0;
       }
 
       /**
