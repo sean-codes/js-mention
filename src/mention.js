@@ -174,39 +174,7 @@ class Mention {
 	* Updates the display (finds mentions and underlines/bolds them)
 	*/
    updateDisplay() {
-      // Start outside in
-      var inputValue = this.html.input.value.split('')
-      var words = []
-      var word = ''
-      for(var index in inputValue) {
-         var letter = inputValue[index]
-         var lastLetter = inputValue[index-1] || ' '
-         var start = letter == this.symbol && (lastLetter == ' ' || lastLetter.charCodeAt(0) == 10 || lastLetter == '\\n')
-         if((start || word.length) && letter != ' ') word += letter
-         if(letter == ' ' && word.length){
-            words.unshift({ word: word, start: index-word.length })
-            word = ''
-         }
-      }
-
-      console.log(words)
-      for(var word of words) {
-         for(var option of this.options) {
-            if(this.symbol+option.name == word.word) {
-               var optionHTML = document.createElement('u')
-
-               optionHTML.innerHTML = word.word
-               optionHTML.setAttribute('mentiondata', JSON.stringify(option))
-               //inputValue = inputValue.split('')
-               inputValue.splice(word.start, word.word.length, optionHTML.outerHTML)
-            }
-         }
-      }
-
-      // Replace Line breaks and spaces with HTML
-      inputValue = inputValue.join('')
-      if(inputValue[inputValue.length-1] != ' ') inputValue += '&nbsp;'
-      this.html.display.innerHTML = inputValue
+      this.html.display.innerHTML = this.replaceInputWithHTML()
 
       // Fix the html styles
       var computedStylesInput = window.getComputedStyle(this.html.input)
@@ -280,6 +248,15 @@ class Mention {
       viewableOptions[this.hover].classList.add('hover')
    }
 
+   /**
+   * Sets the cursor position in the text area
+   * @param {Number} position - the position
+   */
+   setCursorPosition(position) {
+      this.cursorPosition = position
+      this.html.input.setSelectionRange(position, position);
+   }
+
 	/**
 	* Returns the mentions form the input. Returns the value of the option with its properties
 	*/
@@ -293,12 +270,51 @@ class Mention {
    }
 
    /**
-   * Sets the cursor position in the text area
-   * @param {Number} position - the position
+   * Loops through the word matches and replaces them with underlines
+   * @returns {string} the input value in an html form
    */
-   setCursorPosition(position) {
-      this.cursorPosition = position
-      this.html.input.setSelectionRange(position, position);
+   replaceInputWithHTML() {
+      var words = this.findMatches()
+      var inputValue = this.html.input.value.split('')
+
+      for(var word of words) {
+         for(var option of this.options) {
+            if(this.symbol+option.name == word.word) {
+               var optionHTML = document.createElement('u')
+               optionHTML.innerHTML = word.word
+               optionHTML.setAttribute('mentiondata', JSON.stringify(option))
+
+               inputValue.splice(word.index, word.word.length, optionHTML.outerHTML)
+            }
+         }
+      }
+
+      // Replace Line breaks and spaces with HTML
+      inputValue = inputValue.join('')
+      if(inputValue[inputValue.length-1] != ' ') inputValue += '&nbsp;'
+      return inputValue
+   }
+
+   /**
+	* Loops over the input value.
+   * @return {match[]} - Array of matches { word: word, index: index word is at}
+	*/
+   findMatches() {
+      var inputValue = this.html.input.value.split('')
+      var words = []
+      var word = ''
+      for(var index in inputValue) {
+         var letter = inputValue[index]
+         var lastLetter = inputValue[index-1] || ' '
+         var start = letter == this.symbol && (lastLetter == ' ' || lastLetter.charCodeAt(0) == 10 || lastLetter == '\\n')
+         if((start || word.length) && letter != ' ') word += letter
+         if(letter == ' ' && word.length){
+            words.unshift({ word: word, index: index-word.length })
+            word = ''
+         }
+      }
+
+      return words
    }
 
 	/**

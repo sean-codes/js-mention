@@ -251,81 +251,7 @@ var Mention = function () {
    }, {
       key: 'updateDisplay',
       value: function updateDisplay() {
-         // Start outside in
-         var inputValue = this.html.input.value.split('');
-         var words = [];
-         var word = '';
-         for (var index in inputValue) {
-            var letter = inputValue[index];
-            var lastLetter = inputValue[index - 1] || ' ';
-            var start = letter == this.symbol && (lastLetter == ' ' || lastLetter.charCodeAt(0) == 10 || lastLetter == '\\n');
-            if ((start || word.length) && letter != ' ') word += letter;
-            if (letter == ' ' && word.length) {
-               words.unshift({ word: word, start: index - word.length });
-               word = '';
-            }
-         }
-
-         console.log(words);
-         var _iteratorNormalCompletion2 = true;
-         var _didIteratorError2 = false;
-         var _iteratorError2 = undefined;
-
-         try {
-            for (var _iterator2 = words[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-               var word = _step2.value;
-               var _iteratorNormalCompletion3 = true;
-               var _didIteratorError3 = false;
-               var _iteratorError3 = undefined;
-
-               try {
-                  for (var _iterator3 = this.options[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                     var option = _step3.value;
-
-                     if (this.symbol + option.name == word.word) {
-                        var optionHTML = document.createElement('u');
-
-                        optionHTML.innerHTML = word.word;
-                        optionHTML.setAttribute('mentiondata', JSON.stringify(option));
-                        //inputValue = inputValue.split('')
-                        inputValue.splice(word.start, word.word.length, optionHTML.outerHTML);
-                     }
-                  }
-               } catch (err) {
-                  _didIteratorError3 = true;
-                  _iteratorError3 = err;
-               } finally {
-                  try {
-                     if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
-                     }
-                  } finally {
-                     if (_didIteratorError3) {
-                        throw _iteratorError3;
-                     }
-                  }
-               }
-            }
-
-            // Replace Line breaks and spaces with HTML
-         } catch (err) {
-            _didIteratorError2 = true;
-            _iteratorError2 = err;
-         } finally {
-            try {
-               if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                  _iterator2.return();
-               }
-            } finally {
-               if (_didIteratorError2) {
-                  throw _iteratorError2;
-               }
-            }
-         }
-
-         inputValue = inputValue.join('');
-         if (inputValue[inputValue.length - 1] != ' ') inputValue += '&nbsp;';
-         this.html.display.innerHTML = inputValue;
+         this.html.display.innerHTML = this.replaceInputWithHTML();
 
          // Fix the html styles
          var computedStylesInput = window.getComputedStyle(this.html.input);
@@ -404,27 +330,27 @@ var Mention = function () {
             return e.classList.contains('show');
          });
          if (!viewableOptions.length) return;
-         var _iteratorNormalCompletion4 = true;
-         var _didIteratorError4 = false;
-         var _iteratorError4 = undefined;
+         var _iteratorNormalCompletion2 = true;
+         var _didIteratorError2 = false;
+         var _iteratorError2 = undefined;
 
          try {
-            for (var _iterator4 = this.html.options[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-               var option = _step4.value;
+            for (var _iterator2 = this.html.options[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+               var option = _step2.value;
 
                option.classList.remove('hover');
             }
          } catch (err) {
-            _didIteratorError4 = true;
-            _iteratorError4 = err;
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
          } finally {
             try {
-               if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                  _iterator4.return();
+               if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                  _iterator2.return();
                }
             } finally {
-               if (_didIteratorError4) {
-                  throw _iteratorError4;
+               if (_didIteratorError2) {
+                  throw _iteratorError2;
                }
             }
          }
@@ -440,43 +366,6 @@ var Mention = function () {
       }
 
       /**
-      * Returns the mentions form the input. Returns the value of the option with its properties
-      */
-
-   }, {
-      key: 'collect',
-      value: function collect() {
-         var data = [];
-         var added = this.html.display.querySelectorAll('u');
-         var _iteratorNormalCompletion5 = true;
-         var _didIteratorError5 = false;
-         var _iteratorError5 = undefined;
-
-         try {
-            for (var _iterator5 = added[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-               var add = _step5.value;
-
-               data.push(JSON.parse(add.getAttribute('mentiondata')));
-            }
-         } catch (err) {
-            _didIteratorError5 = true;
-            _iteratorError5 = err;
-         } finally {
-            try {
-               if (!_iteratorNormalCompletion5 && _iterator5.return) {
-                  _iterator5.return();
-               }
-            } finally {
-               if (_didIteratorError5) {
-                  throw _iteratorError5;
-               }
-            }
-         }
-
-         return data;
-      }
-
-      /**
       * Sets the cursor position in the text area
       * @param {Number} position - the position
       */
@@ -486,6 +375,139 @@ var Mention = function () {
       value: function setCursorPosition(position) {
          this.cursorPosition = position;
          this.html.input.setSelectionRange(position, position);
+      }
+
+      /**
+      * Returns the mentions form the input. Returns the value of the option with its properties
+      */
+
+   }, {
+      key: 'collect',
+      value: function collect() {
+         var data = [];
+         var added = this.html.display.querySelectorAll('u');
+         var _iteratorNormalCompletion3 = true;
+         var _didIteratorError3 = false;
+         var _iteratorError3 = undefined;
+
+         try {
+            for (var _iterator3 = added[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+               var add = _step3.value;
+
+               data.push(JSON.parse(add.getAttribute('mentiondata')));
+            }
+         } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+         } finally {
+            try {
+               if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                  _iterator3.return();
+               }
+            } finally {
+               if (_didIteratorError3) {
+                  throw _iteratorError3;
+               }
+            }
+         }
+
+         return data;
+      }
+
+      /**
+      * Loops through the word matches and replaces them with underlines
+      * @returns {string} the input value in an html form
+      */
+
+   }, {
+      key: 'replaceInputWithHTML',
+      value: function replaceInputWithHTML() {
+         var words = this.findMatches();
+         var inputValue = this.html.input.value.split('');
+
+         var _iteratorNormalCompletion4 = true;
+         var _didIteratorError4 = false;
+         var _iteratorError4 = undefined;
+
+         try {
+            for (var _iterator4 = words[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+               var word = _step4.value;
+               var _iteratorNormalCompletion5 = true;
+               var _didIteratorError5 = false;
+               var _iteratorError5 = undefined;
+
+               try {
+                  for (var _iterator5 = this.options[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                     var option = _step5.value;
+
+                     if (this.symbol + option.name == word.word) {
+                        var optionHTML = document.createElement('u');
+                        optionHTML.innerHTML = word.word;
+                        optionHTML.setAttribute('mentiondata', JSON.stringify(option));
+
+                        inputValue.splice(word.index, word.word.length, optionHTML.outerHTML);
+                     }
+                  }
+               } catch (err) {
+                  _didIteratorError5 = true;
+                  _iteratorError5 = err;
+               } finally {
+                  try {
+                     if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                        _iterator5.return();
+                     }
+                  } finally {
+                     if (_didIteratorError5) {
+                        throw _iteratorError5;
+                     }
+                  }
+               }
+            }
+
+            // Replace Line breaks and spaces with HTML
+         } catch (err) {
+            _didIteratorError4 = true;
+            _iteratorError4 = err;
+         } finally {
+            try {
+               if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                  _iterator4.return();
+               }
+            } finally {
+               if (_didIteratorError4) {
+                  throw _iteratorError4;
+               }
+            }
+         }
+
+         inputValue = inputValue.join('');
+         if (inputValue[inputValue.length - 1] != ' ') inputValue += '&nbsp;';
+         return inputValue;
+      }
+
+      /**
+      * Loops over the input value.
+      * @return {match[]} - Array of matches { word: word, index: index word is at}
+      */
+
+   }, {
+      key: 'findMatches',
+      value: function findMatches() {
+         var inputValue = this.html.input.value.split('');
+         var words = [];
+         var word = '';
+         for (var index in inputValue) {
+            var letter = inputValue[index];
+            var lastLetter = inputValue[index - 1] || ' ';
+            var start = letter == this.symbol && (lastLetter == ' ' || lastLetter.charCodeAt(0) == 10 || lastLetter == '\\n');
+            if ((start || word.length) && letter != ' ') word += letter;
+            if (letter == ' ' && word.length) {
+               words.unshift({ word: word, index: index - word.length });
+               word = '';
+            }
+         }
+
+         return words;
       }
 
       /**
