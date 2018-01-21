@@ -174,17 +174,39 @@ class Mention {
 	* Updates the display (finds mentions and underlines/bolds them)
 	*/
    updateDisplay() {
-      var storeText = this.html.input.value.replace(/\r?\n/g, ' <br/>').replace(/ /g, ' ')
-      if(storeText[storeText.length-1] == '>') storeText += '&nbsp;'
-      for(var option of this.options) {
-         var optionHTML = document.createElement('u')
-
-         optionHTML.innerHTML = this.symbol + (option.name || option)
-         optionHTML.setAttribute('mentiondata', JSON.stringify(option))
-         storeText = storeText.replace(new RegExp('@'+option.name, 'g'), optionHTML.outerHTML)
+      // Start outside in
+      var inputValue = this.html.input.value.split('')
+      var words = []
+      var word = ''
+      for(var index in inputValue) {
+         var letter = inputValue[index]
+         var lastLetter = inputValue[index-1] || ' '
+         var start = letter == this.symbol && (lastLetter == ' ' || lastLetter.charCodeAt(0) == 10 || lastLetter == '\\n')
+         if((start || word.length) && letter != ' ') word += letter
+         if(letter == ' ' && word.length){
+            words.unshift({ word: word, start: index-word.length })
+            word = ''
+         }
       }
 
-      this.html.display.innerHTML = storeText
+      console.log(words)
+      for(var word of words) {
+         for(var option of this.options) {
+            if(this.symbol+option.name == word.word) {
+               var optionHTML = document.createElement('u')
+
+               optionHTML.innerHTML = word.word
+               optionHTML.setAttribute('mentiondata', JSON.stringify(option))
+               //inputValue = inputValue.split('')
+               inputValue.splice(word.start, word.word.length, optionHTML.outerHTML)
+            }
+         }
+      }
+
+      // Replace Line breaks and spaces with HTML
+      inputValue = inputValue.join('')
+      if(inputValue[inputValue.length-1] != ' ') inputValue += '&nbsp;'
+      this.html.display.innerHTML = inputValue
 
       // Fix the html styles
       var computedStylesInput = window.getComputedStyle(this.html.input)

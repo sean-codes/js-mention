@@ -19,7 +19,7 @@ gulp.task('css', function() {
 
 gulp.task('js', function() {
    return gulp.src('src/mention.js')
-      .pipe(babel({ "presets": ["env"] }))
+      .pipe(babel({ "presets": ["env"] })).on('error', console.log)
       .pipe(gulp.dest('bin'))
 })
 

@@ -251,22 +251,63 @@ var Mention = function () {
    }, {
       key: 'updateDisplay',
       value: function updateDisplay() {
-         var storeText = this.html.input.value.replace(/\r?\n/g, ' <br/>').replace(/ /g, ' ');
-         if (storeText[storeText.length - 1] == '>') storeText += '&nbsp;';
+         // Start outside in
+         var inputValue = this.html.input.value.split('');
+         var words = [];
+         var word = '';
+         for (var index in inputValue) {
+            var letter = inputValue[index];
+            var lastLetter = inputValue[index - 1] || ' ';
+            var start = letter == this.symbol && (lastLetter == ' ' || lastLetter.charCodeAt(0) == 10 || lastLetter == '\\n');
+            if ((start || word.length) && letter != ' ') word += letter;
+            if (letter == ' ' && word.length) {
+               words.unshift({ word: word, start: index - word.length });
+               word = '';
+            }
+         }
+
+         console.log(words);
          var _iteratorNormalCompletion2 = true;
          var _didIteratorError2 = false;
          var _iteratorError2 = undefined;
 
          try {
-            for (var _iterator2 = this.options[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-               var option = _step2.value;
+            for (var _iterator2 = words[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+               var word = _step2.value;
+               var _iteratorNormalCompletion3 = true;
+               var _didIteratorError3 = false;
+               var _iteratorError3 = undefined;
 
-               var optionHTML = document.createElement('u');
+               try {
+                  for (var _iterator3 = this.options[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                     var option = _step3.value;
 
-               optionHTML.innerHTML = this.symbol + (option.name || option);
-               optionHTML.setAttribute('mentiondata', JSON.stringify(option));
-               storeText = storeText.replace(new RegExp('@' + option.name, 'g'), optionHTML.outerHTML);
+                     if (this.symbol + option.name == word.word) {
+                        var optionHTML = document.createElement('u');
+
+                        optionHTML.innerHTML = word.word;
+                        optionHTML.setAttribute('mentiondata', JSON.stringify(option));
+                        //inputValue = inputValue.split('')
+                        inputValue.splice(word.start, word.word.length, optionHTML.outerHTML);
+                     }
+                  }
+               } catch (err) {
+                  _didIteratorError3 = true;
+                  _iteratorError3 = err;
+               } finally {
+                  try {
+                     if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                     }
+                  } finally {
+                     if (_didIteratorError3) {
+                        throw _iteratorError3;
+                     }
+                  }
+               }
             }
+
+            // Replace Line breaks and spaces with HTML
          } catch (err) {
             _didIteratorError2 = true;
             _iteratorError2 = err;
@@ -282,7 +323,9 @@ var Mention = function () {
             }
          }
 
-         this.html.display.innerHTML = storeText;
+         inputValue = inputValue.join('');
+         if (inputValue[inputValue.length - 1] != ' ') inputValue += '&nbsp;';
+         this.html.display.innerHTML = inputValue;
 
          // Fix the html styles
          var computedStylesInput = window.getComputedStyle(this.html.input);
@@ -361,27 +404,27 @@ var Mention = function () {
             return e.classList.contains('show');
          });
          if (!viewableOptions.length) return;
-         var _iteratorNormalCompletion3 = true;
-         var _didIteratorError3 = false;
-         var _iteratorError3 = undefined;
+         var _iteratorNormalCompletion4 = true;
+         var _didIteratorError4 = false;
+         var _iteratorError4 = undefined;
 
          try {
-            for (var _iterator3 = this.html.options[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-               var option = _step3.value;
+            for (var _iterator4 = this.html.options[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+               var option = _step4.value;
 
                option.classList.remove('hover');
             }
          } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
+            _didIteratorError4 = true;
+            _iteratorError4 = err;
          } finally {
             try {
-               if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                  _iterator3.return();
+               if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                  _iterator4.return();
                }
             } finally {
-               if (_didIteratorError3) {
-                  throw _iteratorError3;
+               if (_didIteratorError4) {
+                  throw _iteratorError4;
                }
             }
          }
@@ -405,27 +448,27 @@ var Mention = function () {
       value: function collect() {
          var data = [];
          var added = this.html.display.querySelectorAll('u');
-         var _iteratorNormalCompletion4 = true;
-         var _didIteratorError4 = false;
-         var _iteratorError4 = undefined;
+         var _iteratorNormalCompletion5 = true;
+         var _didIteratorError5 = false;
+         var _iteratorError5 = undefined;
 
          try {
-            for (var _iterator4 = added[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-               var add = _step4.value;
+            for (var _iterator5 = added[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+               var add = _step5.value;
 
                data.push(JSON.parse(add.getAttribute('mentiondata')));
             }
          } catch (err) {
-            _didIteratorError4 = true;
-            _iteratorError4 = err;
+            _didIteratorError5 = true;
+            _iteratorError5 = err;
          } finally {
             try {
-               if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                  _iterator4.return();
+               if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                  _iterator5.return();
                }
             } finally {
-               if (_didIteratorError4) {
-                  throw _iteratorError4;
+               if (_didIteratorError5) {
+                  throw _iteratorError5;
                }
             }
          }
