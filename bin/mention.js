@@ -111,8 +111,7 @@ var Mention = function () {
          this.html.display.style.top = '0px';
          this.html.display.style.width = '100%';
          this.html.input.style.width = '100%';
-         this.html.display.style.overflow = 'hidden';
-         this.html.input.style.overflow = 'hidden';
+         this.html.display.style.height = 'fit-content';
 
          this.html.optionsList = document.createElement('div');
          this.html.optionsList.classList.add('mention-options');
@@ -253,7 +252,7 @@ var Mention = function () {
       key: 'updateDisplay',
       value: function updateDisplay() {
          var storeText = this.html.input.value.replace(/\r?\n/g, ' <br/>').replace(/ /g, ' ');
-
+         if (storeText[storeText.length - 1] == '>') storeText += '&nbsp;';
          var _iteratorNormalCompletion2 = true;
          var _didIteratorError2 = false;
          var _iteratorError2 = undefined;
@@ -285,12 +284,11 @@ var Mention = function () {
 
          this.html.display.innerHTML = storeText;
 
-         // HTML Fixes
-         var computedStyleInput = window.getComputedStyle(this.html.input, "");
-         var height = this.html.input.scrollHeight; // + parseInt(computedStyleInput.getPropertyValue('padding-bottom'))
-         this.html.display.style.minHeight = height + 'px';
-         this.html.input.style.minHeight = height + 'px';
-         this.html.input.scrollTop = 0;
+         // Fix the html styles
+         var computedStylesInput = window.getComputedStyle(this.html.input);
+         var minHeight = parseInt(computedStylesInput.getPropertyValue('height'));
+         if (minHeight < this.html.display.offsetHeight) minHeight = this.html.display.offsetHeight;
+         this.html.input.style.height = minHeight + 'px';
       }
 
       /**
@@ -436,14 +434,6 @@ var Mention = function () {
       }
 
       /**
-      * Removes the HTML and listeners
-      */
-
-   }, {
-      key: 'deconctruct',
-      value: function deconctruct() {}
-
-      /**
       * Sets the cursor position in the text area
       * @param {Number} position - the position
       */
@@ -451,10 +441,17 @@ var Mention = function () {
    }, {
       key: 'setCursorPosition',
       value: function setCursorPosition(position) {
-         console.log('Setting position: ' + position);
          this.cursorPosition = position;
          this.html.input.setSelectionRange(position, position);
       }
+
+      /**
+      * Removes the HTML and listeners
+      */
+
+   }, {
+      key: 'deconctruct',
+      value: function deconctruct() {}
    }]);
 
    return Mention;

@@ -89,8 +89,7 @@ class Mention {
       this.html.display.style.top = '0px'
       this.html.display.style.width = '100%';
       this.html.input.style.width = '100%'
-      this.html.display.style.overflow = 'hidden'
-      this.html.input.style.overflow = 'hidden'
+      this.html.display.style.height = 'fit-content'
 
       this.html.optionsList = document.createElement('div')
       this.html.optionsList.classList.add('mention-options')
@@ -176,7 +175,7 @@ class Mention {
 	*/
    updateDisplay() {
       var storeText = this.html.input.value.replace(/\r?\n/g, ' <br/>').replace(/ /g, ' ')
-
+      if(storeText[storeText.length-1] == '>') storeText += '&nbsp;'
       for(var option of this.options) {
          var optionHTML = document.createElement('u')
 
@@ -184,14 +183,14 @@ class Mention {
          optionHTML.setAttribute('mentiondata', JSON.stringify(option))
          storeText = storeText.replace(new RegExp('@'+option.name, 'g'), optionHTML.outerHTML)
       }
+
       this.html.display.innerHTML = storeText
 
-      // HTML Fixes
-      var computedStyleInput = window.getComputedStyle(this.html.input, "")
-      var height = this.html.input.scrollHeight// + parseInt(computedStyleInput.getPropertyValue('padding-bottom'))
-      this.html.display.style.height = height + 'px'
-      this.html.input.style.height = height + 'px'
-      this.html.input.scrollTop = 0
+      // Fix the html styles
+      var computedStylesInput = window.getComputedStyle(this.html.input)
+      var minHeight = parseInt(computedStylesInput.getPropertyValue('height'))
+      if( minHeight < this.html.display.offsetHeight) minHeight = this.html.display.offsetHeight
+      this.html.input.style.height = minHeight + 'px'
    }
 
 	/**
@@ -240,7 +239,7 @@ class Mention {
       for(var option in this.options) {
          var word = this.inputData.word.replace('@', '')
          this.html.options[option].classList.remove('show')
-         if(this.match(word, this.options[option])) this.html.options[option].classList.add('show', )
+         if(this.match(word, this.options[option])) this.html.options[option].classList.add('show')
       }
    }
 
@@ -271,21 +270,20 @@ class Mention {
       return data
    }
 
-	/**
-	* Removes the HTML and listeners
-	*/
-   deconctruct() {
-
-   }
-
    /**
    * Sets the cursor position in the text area
    * @param {Number} position - the position
    */
    setCursorPosition(position) {
-      console.log('Setting position: ' + position)
       this.cursorPosition = position
       this.html.input.setSelectionRange(position, position);
+   }
+
+	/**
+	* Removes the HTML and listeners
+	*/
+   deconctruct() {
+
    }
 }
 
