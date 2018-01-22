@@ -28,33 +28,37 @@ tape('HTML is setup', (test) => {
    test.end()
 })
 
-tape('Input Data can be Located', (test) => {
+tape('Read word at cursor', (test) => {
    //Create mention
    var mention = new Mention(settings)
 
    input = { value: '@awd', cursorPosition: 4 }
-   output = { word: '@awd', start: 0, end: 4 }
-   test.deepEqual(mention.locateInputData(input), output, 'Basic locate Input data')
+   output = { word: '@awd', index: 0 }
+   test.deepEqual(mention.readWordAtCursor(input), output, 'Basic locate Input data')
 
    input = { value: '@awd @', cursorPosition: 4 }
-   output = { word: '@awd', start: 0, end: 4 }
-   test.deepEqual(mention.locateInputData(input), output, 'Basic locate input date with @ after')
+   output = { word: '@awd', index: 0 }
+   test.deepEqual(mention.readWordAtCursor(input), output, 'Basic locate input date with @ after')
 
    input = { value: '@awd\n', cursorPosition: 5 }
-   output = { word: '', start: 5, end: 5 }
-   test.deepEqual(mention.locateInputData(input), output, 'Locate input data with enter')
+   output = { word: '', index: 5 }
+   test.deepEqual(mention.readWordAtCursor(input), output, 'Locate input data with enter')
 
    input = { value: '@awd \n@', cursorPosition: 7 }
-   output = { word: '@', start: 6, end: 7 }
-   test.deepEqual(mention.locateInputData(input), output, 'Locate input data with enter and @ after')
+   output = { word: '@', index: 6 }
+   test.deepEqual(mention.readWordAtCursor(input), output, 'Locate input data with space + enter and @ after')
 
    input = { value: '@awd @', cursorPosition: 6 }
-   output = { word: '@', start: 5, end: 6 }
-   test.deepEqual(mention.locateInputData(input), output, 'Locate input data with space and @ after')
+   output = { word: '@', index: 5}
+   test.deepEqual(mention.readWordAtCursor(input), output, 'Locate input data with space and @ after')
 
    input = { value: '@awd', cursorPosition: 3 }
-   output = { word: '@aw', start: 0, end: 4 }
-   test.deepEqual(mention.locateInputData(input), output, 'Cursor within input value. Moves end around the word ex. @a|wda')
+   output = { word: '@awd', index:0 }
+   test.deepEqual(mention.readWordAtCursor(input), output, 'Cursor within input value. Moves end around the word ex. @a|wda')
+
+   input = { value: '@awd@awd', cursorPosition: 8 }
+   output = { word: '@awd@awd', index: 0 }
+   test.deepEqual(mention.readWordAtCursor(input), output, 'Multiple @ symbols in the word')
 
    test.end()
 })
