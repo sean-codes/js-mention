@@ -83,7 +83,43 @@ tape('Cursor moves. Toggle options open/closed', (test) => {
    test.end()
 })
 
-tape('Display follows input on scroll', (test) => {
 
+tape('Display and textarea expand to fit content', (test) => {
+   var mention = new Mention(settings)
+
+   mention.input.value = 'awdw'
+   mention.updateDisplay()
+   test.equal(mention.html.display.offsetHeight, 19, 'One line no breaks')
+
+   mention.input.value = 'awdw \r'
+   mention.updateDisplay()
+   test.equal(mention.html.display.offsetHeight, 32, 'One line with line break no text after')
+
+   mention.input.value = 'awdw \r\r'
+   mention.updateDisplay()
+   test.equal(mention.html.display.offsetHeight, 45, 'one lines with two linebreaks no spaces')
+
+   test.end()
+})
+
+tape('Finding options that match', (test) => {
+   var mention = new Mention(settings)
+   mention.input.value = ''
+   test.deepEqual(mention.findMatches(), [], 'No value gets empty array')
+
+   mention.input.value = 'Nothing to find here'
+   test.deepEqual(mention.findMatches(), [], 'Value without and matches')
+
+   mention.input.value = '@one'
+   var expected = [{ word: '@one', index: 0 }]
+   test.deepEqual(mention.findMatches(), expected, 'One options no space after at index 0')
+
+   mention.input.value = '@one @two'
+   var expected = [{ word: '@two', index: 5 }, { word: '@one', index: 0 }]
+   test.deepEqual(mention.findMatches(), expected, 'Two matches no space after last')
+   test.end()
+})
+
+tape('replacing matches with HTML', (test) => {
    test.end()
 })

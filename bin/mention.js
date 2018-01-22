@@ -221,10 +221,13 @@ var Mention = function () {
    }, {
       key: 'onEventOptionClick',
       value: function onEventOptionClick(optionEle) {
-         var word = JSON.parse(optionEle.getAttribute('mentiondata')).name;
-         this.html.input.value = this.html.input.value.substring(0, this.inputData.start) + '@' + word + this.html.input.value.substring(this.inputData.end, this.html.input.value.length) + ' ';
+         var word = this.symbol + JSON.parse(optionEle.getAttribute('mentiondata')).name + ' ';
+         var splitInputValue = this.html.input.value.split('');
+         console.log(this.inputData);
+         splitInputValue.splice(this.inputData.index, this.inputData.word.length, word);
+         this.html.input.value = splitInputValue.join('');
          this.html.input.focus();
-         this.setCursorPosition(this.inputData.end + word.length + 1);
+         this.setCursorPosition(this.inputData.index + word.length + 1);
          this.updateDisplay();
          this.toggleOptions(false);
       }
@@ -489,17 +492,21 @@ var Mention = function () {
    }, {
       key: 'findMatches',
       value: function findMatches() {
-         var inputValue = this.html.input.value.split('');
+         var inputValue = this.html.input.value.split('').concat([' ']);
          var words = [];
-         var word = '';
+
+         var currentWord = '';
          for (var index in inputValue) {
             var letter = inputValue[index];
             var lastLetter = inputValue[index - 1] || ' ';
-            var start = letter == this.symbol && (lastLetter == ' ' || lastLetter.charCodeAt(0) == 10 || lastLetter == '\\n');
-            if ((start || word.length) && letter != ' ') word += letter;
-            if (letter == ' ' && word.length) {
-               words.unshift({ word: word, index: index - word.length });
-               word = '';
+            var lastLetterIsSpace = [' ', '\\n'].indexOf(lastLetter) > -1 || lastLetter.charCodeAt(0) == 10;
+            var canStartWord = letter.includes(this.symbol) && lastLetterIsSpace;
+
+            if ((canStartWord || currentWord.length) && letter != ' ') currentWord += letter;
+
+            if (currentWord.length && letter == ' ') {
+               words.unshift({ word: currentWord, index: Math.max(index - currentWord.length, 0) });
+               currentWord = '';
             }
          }
 
