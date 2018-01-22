@@ -54,7 +54,7 @@ tape('Read word at cursor', (test) => {
 
    input = { value: '@awd', cursorPosition: 3 }
    output = { word: '@awd', index:0 }
-   test.deepEqual(mention.readWordAtCursor(input), output, 'Cursor within input value. Moves end around the word ex. @a|wda')
+   test.deepEqual(mention.readWordAtCursor(input), output, 'Cursor within value. Moves to end of word ex. @a|wda')
 
    input = { value: '@awd@awd', cursorPosition: 8 }
    output = { word: '@awd@awd', index: 0 }
@@ -120,6 +120,23 @@ tape('Finding options that match', (test) => {
    test.end()
 })
 
-tape('replacing matches with HTML', (test) => {
+tape('replacing Input Value with HTML', (test) => {
+   //Create mention
+   var mention = new Mention(settings)
+   mention.html.input.value = '@one'
+   mention.updateDisplay()
+   var expected = '<u mentiondata="&quot;one&quot;">@one</u>&nbsp;'
+   test.equal(mention.html.display.innerHTML, expected, 'One match one <u> element with nbsp')
+
+   mention.html.input.value = '@one @one'
+   mention.updateDisplay()
+   var expected = '<u mentiondata="&quot;one&quot;">@one</u> <u mentiondata="&quot;one&quot;">@one</u>&nbsp;'
+   test.equal(mention.html.display.innerHTML, expected, 'Two matches two <u> element with nbsp')
+
+   mention.html.input.value = '@one \n @two'
+   mention.updateDisplay()
+   var expected = '<u mentiondata="&quot;one&quot;">@one</u> \n <u mentiondata="&quot;two&quot;">@two</u>&nbsp;'
+   test.equal(mention.html.display.innerHTML, expected, 'Two matches two <u> element with line break')
+
    test.end()
 })
