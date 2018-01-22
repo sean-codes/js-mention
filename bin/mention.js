@@ -237,8 +237,8 @@ var Mention = function () {
       key: 'cursorPositionChanged',
       value: function cursorPositionChanged() {
          this.cursorPosition = this.html.input.selectionStart;
-         this.inputData = this.locateInputData({ cursorPosition: this.cursorPosition, value: this.input.value });
-         this.toggleOptions(this.inputData.word.length);
+         this.inputData = this.readWordAtCursor({ cursorPosition: this.cursorPosition, value: this.input.value });
+         this.toggleOptions(this.inputData.word.length && this.inputData.word[0] == this.symbol);
          this.optionsMatch();
       }
 
@@ -264,32 +264,28 @@ var Mention = function () {
       * From the cursor positoin looks back to match the work and start/end position
       * @param {Object} data - Options to initialize the component with
       * @param {String} [data.value] - the string to search through
-      * @param {Number} [data.cusrorPosition] - The position of the cursor in the string
+      * @param {Number} [data.cursorPosition] - The position of the cursor in the string
       */
 
    }, {
-      key: 'locateInputData',
-      value: function locateInputData(data) {
-         var endPosition = data.cursorPosition;
-         var startPosition = data.cursorPosition;
-         var valueWithReplacedSpecial = data.value.replace(/\n/g, " ");
-         while (startPosition--) {
-            var previousCharacter = valueWithReplacedSpecial[startPosition];
-            if (previousCharacter == ' ' || previousCharacter == '@') break;
+      key: 'readWordAtCursor',
+      value: function readWordAtCursor(data) {
+         var word = '',
+             index = data.cursorPosition;
+         var valueWithReplacedSpecial = data.value.replace(/\n/g, ' ');
+
+         while (index--) {
+            var previousCharacter = valueWithReplacedSpecial[index];
+            if (previousCharacter == ' ' || index < 0) break;
          }
 
-         while (endPosition < valueWithReplacedSpecial.length) {
-            var nextCharacter = valueWithReplacedSpecial[endPosition];
+         while (index++ < valueWithReplacedSpecial.length - 1) {
+            var nextCharacter = valueWithReplacedSpecial[index];
             if (nextCharacter == ' ') break;
-            endPosition++;
+            word += nextCharacter;
          }
 
-         if (previousCharacter != '@') return { start: data.cursorPosition, end: data.cursorPosition, word: '' };
-         return {
-            start: startPosition,
-            end: endPosition,
-            word: valueWithReplacedSpecial.substring(startPosition, data.cursorPosition)
-         };
+         return { index: Math.max(index - word.length, 0), word: word };
       }
 
       /**
