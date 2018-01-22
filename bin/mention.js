@@ -28,6 +28,7 @@ var Mention = function () {
       this.hover = 0;
       this.showingOptions = false;
       this.upDownStay = 0;
+      this.wordAtCursor = {};
       this.update = settings.update || function () {};
       this.match = settings.match || this.defaultMatchFunction;
       this.template = settings.template || this.defaultTemplateFunction;
@@ -223,11 +224,10 @@ var Mention = function () {
       value: function onEventOptionClick(optionEle) {
          var word = this.symbol + JSON.parse(optionEle.getAttribute('mentiondata')).name + ' ';
          var splitInputValue = this.html.input.value.split('');
-         console.log(this.inputData);
-         splitInputValue.splice(this.inputData.index, this.inputData.word.length, word);
+         splitInputValue.splice(this.wordAtCursor.index, this.wordAtCursor.word.length, word);
          this.html.input.value = splitInputValue.join('');
          this.html.input.focus();
-         this.setCursorPosition(this.inputData.index + word.length + 1);
+         this.setCursorPosition(this.wordAtCursor.index + word.length + 1);
          this.updateDisplay();
          this.toggleOptions(false);
       }
@@ -240,8 +240,8 @@ var Mention = function () {
       key: 'cursorPositionChanged',
       value: function cursorPositionChanged() {
          this.cursorPosition = this.html.input.selectionStart;
-         this.inputData = this.readWordAtCursor({ cursorPosition: this.cursorPosition, value: this.input.value });
-         this.toggleOptions(this.inputData.word.length && this.inputData.word[0] == this.symbol);
+         this.wordAtCursor = this.readWordAtCursor({ cursorPosition: this.cursorPosition, value: this.input.value });
+         this.toggleOptions(this.wordAtCursor.word.length && this.wordAtCursor.word[0] == this.symbol);
          this.optionsMatch();
       }
 
@@ -252,7 +252,7 @@ var Mention = function () {
    }, {
       key: 'updateDisplay',
       value: function updateDisplay() {
-         this.html.display.innerHTML = this.replaceInputWithHTML();
+         this.html.display.innerHTML = this.convertInputValueToHTML();
 
          // Fix the html styles
          var computedStylesInput = window.getComputedStyle(this.html.input);
@@ -312,7 +312,7 @@ var Mention = function () {
       key: 'optionsMatch',
       value: function optionsMatch() {
          for (var option in this.options) {
-            var word = this.inputData.word.replace('@', '');
+            var word = this.wordAtCursor.word.replace('@', '');
             this.html.options[option].classList.remove('show');
             if (this.match(word, this.options[option])) this.html.options[option].classList.add('show');
          }
@@ -419,11 +419,10 @@ var Mention = function () {
       */
 
    }, {
-      key: 'replaceInputWithHTML',
-      value: function replaceInputWithHTML() {
+      key: 'convertInputValueToHTML',
+      value: function convertInputValueToHTML() {
          var words = this.findMatches();
          var inputValue = this.html.input.value.split('');
-
          var _iteratorNormalCompletion4 = true;
          var _didIteratorError4 = false;
          var _iteratorError4 = undefined;
@@ -439,7 +438,7 @@ var Mention = function () {
                   for (var _iterator5 = this.options[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                      var option = _step5.value;
 
-                     if (this.symbol + option.name == word.word) {
+                     if (this.symbol + (option.name || option) == word.word) {
                         var optionHTML = document.createElement('u');
                         optionHTML.innerHTML = word.word;
                         optionHTML.setAttribute('mentiondata', JSON.stringify(option));
