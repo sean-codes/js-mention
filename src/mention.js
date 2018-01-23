@@ -110,11 +110,12 @@ class Mention {
 	* Begins listening for events on the input and options
 	*/
    listen() {
-      var that = this
       this.html.input.addEventListener('input', () => { this.onEventInput() })
       this.html.input.addEventListener('keydown', (e) => { this.onEventKeyDown(e) })
       this.html.input.addEventListener('keyup', (e) => { this.onEventKeyUp(e) })
-      this.html.options.forEach((o) => { o.addEventListener('click', (e) => { this.onEventOptionClick(e.target) }) })
+      this.html.options.forEach((o) => {
+         o.addEventListener('click', (e) => { this.onEventOptionClick(e.target) })
+      })
    }
 
 	/**
@@ -135,7 +136,7 @@ class Mention {
       if(this.upDownStay && this.showingOptions) e.preventDefault()
       if(e.keyCode == 13 && this.showingOptions) {
          e.preventDefault()
-         this.onEventOptionClick(this.html.options.find(function(e) { return e.classList.contains('hover') }))
+         this.onEventOptionClick(this.html.options.find((e) => e.classList.contains('hover')))
       }
    }
 
@@ -144,8 +145,8 @@ class Mention {
 	* @param {Event} e - the event passed
 	*/
    onEventKeyUp() {
-      this.setHoverOption()
       this.cursorPositionChanged()
+      this.setHoverOption()
    }
 
    /**
@@ -228,6 +229,7 @@ class Mention {
       for(var option in this.options) {
          var word = this.wordAtCursor.word.replace('@', '')
          this.html.options[option].classList.remove('show')
+
          if(this.match(word, this.options[option])) this.html.options[option].classList.add('show')
       }
    }
@@ -236,11 +238,12 @@ class Mention {
 	* Using up/down arrow selects the next option
 	*/
    setHoverOption() {
-      var viewableOptions = this.html.options.filter(function(e){ return e.classList.contains('show') })
+      var viewableOptions = this.html.options.filter((e) => {
+         e.classList.remove('hover')
+         return e.classList.contains('show')
+      })
       if(!viewableOptions.length) return
-      for(var option of this.html.options) {
-         option.classList.remove('hover')
-      }
+
       this.hover = this.upDownStay ? this.hover + this.upDownStay : 0
       if(this.hover < 0){ this.hover = viewableOptions.length - 1 }
       if(this.hover == viewableOptions.length) { this.hover = 0}
