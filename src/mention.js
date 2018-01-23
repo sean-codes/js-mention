@@ -137,6 +137,7 @@ class Mention {
       if(e.keyCode == 13 && this.showingOptions) {
          e.preventDefault()
          this.onEventOptionClick(this.html.options.find((e) => e.classList.contains('hover')))
+
       }
    }
 
@@ -145,8 +146,8 @@ class Mention {
 	* @param {Event} e - the event passed
 	*/
    onEventKeyUp() {
-      this.cursorPositionChanged()
       this.setHoverOption()
+      this.cursorPositionChanged()
    }
 
    /**
@@ -161,6 +162,7 @@ class Mention {
       this.setCursorPosition(this.wordAtCursor.index + word.length + 1)
       this.updateDisplay()
       this.toggleOptions(false)
+      this.update()
    }
 
    /**

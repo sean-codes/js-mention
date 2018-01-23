@@ -210,8 +210,8 @@ var Mention = function () {
    }, {
       key: 'onEventKeyUp',
       value: function onEventKeyUp() {
-         this.cursorPositionChanged();
          this.setHoverOption();
+         this.cursorPositionChanged();
       }
 
       /**
@@ -229,6 +229,7 @@ var Mention = function () {
          this.setCursorPosition(this.wordAtCursor.index + word.length + 1);
          this.updateDisplay();
          this.toggleOptions(false);
+         this.update();
       }
 
       /**
