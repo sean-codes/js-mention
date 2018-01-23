@@ -1,12 +1,14 @@
 var gulp = require('gulp')
 var sass = require('gulp-sass')
 var babel = require("gulp-babel")
+var uglify = require('gulp-uglify')
+var rename = require('gulp-rename')
 var browserify = require('browserify')
 var tapSpec = require('tap-spec')
 var run = require('tape-run')
 
 // Defauklt / Watch
-gulp.task('default', ['css', 'js', 'test'])
+gulp.task('default', ['css', 'js', 'compress', 'test'])
 gulp.task('watch', function() {
    gulp.watch(['./src/**/*', './test/test.js'], ['default'])
 })
@@ -20,6 +22,13 @@ gulp.task('css', function() {
 gulp.task('js', function() {
    return gulp.src('src/mention.js')
       .pipe(babel({ "presets": ["env"] })).on('error', console.log)
+      .pipe(gulp.dest('bin'))
+})
+
+gulp.task('compress', function() {
+   return gulp.src('bin/mention.js')
+      .pipe(uglify())
+      .pipe(rename({ suffix: '.min' }))
       .pipe(gulp.dest('bin'))
 })
 
