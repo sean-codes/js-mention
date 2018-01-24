@@ -340,7 +340,6 @@ var Mention = function () {
          if (!viewableOptions.length) return;
 
          this.hover = this.upDownStay ? this.hover + this.upDownStay : 0;
-         console.log(this.hover);
          if (this.hover < 0) {
             this.hover = viewableOptions.length - 1;
          }

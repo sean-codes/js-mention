@@ -1,5 +1,7 @@
 .mention-wrapper {
   position: relative; }
+  .mention-wrapper textarea {
+    resize: none; }
   .mention-wrapper .mention-options {
     box-sizing: border-box;
     position: absolute;

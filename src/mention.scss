@@ -1,6 +1,9 @@
 .mention-wrapper {
    position:relative;
 
+   textarea {
+      resize:none;
+   }
    .mention-options {
       box-sizing:border-box;
       position:absolute;

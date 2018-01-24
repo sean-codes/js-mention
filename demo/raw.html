@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+   <head>
+      <link rel="stylesheet" href="../bin/mention.css">
+   </head>
+   <body>
+      <textarea id="textarea" style="width:100px; min-height:50px;"></textarea>
+      <script src="../bin/mention.js"></script>
+      <script>
+         var myMention = new Mention({
+            input: document.querySelector('#textarea'),
+            options: [
+               { id: 2, name: 'WideEye', description: 'Wideeye Potion' },
+               { id: 100, name: 'LiquidLuck', description: 'Felix Felicis' },
+               { id: 10, name: 'PolyJuice', description: 'Polyjuice Potion' }
+            ]
+         })
+      </script>
+   </body>
+</html>

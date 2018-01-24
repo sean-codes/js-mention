@@ -255,7 +255,6 @@ class Mention {
       if(!viewableOptions.length) return
 
       this.hover = this.upDownStay ? this.hover + this.upDownStay : 0
-      console.log(this.hover);
       if(this.hover < 0){ this.hover = viewableOptions.length - 1 }
       if(this.hover == viewableOptions.length) { this.hover = 0}
       viewableOptions[this.hover].classList.add('hover')
