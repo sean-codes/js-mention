@@ -23,6 +23,8 @@ var Mention = function () {
       var that = this;
       this.options = settings.options || [];
       this.input = settings.input;
+      this.reverse = settings.reverse;
+
       this.symbol = settings.symbol || '@';
       this.cursorPosition = 0;
       this.hover = 0;
@@ -115,6 +117,10 @@ var Mention = function () {
          this.html.optionsList = document.createElement('div');
          this.html.optionsList.classList.add('mention-options');
          this.html.wrapper.appendChild(this.html.optionsList);
+         if (this.reverse) {
+            this.html.optionsList.classList.add('mention-options-reverse');
+            this.html.wrapper.insertBefore(this.html.optionsList, this.html.wrapper.firstChild);
+         }
 
          var _iteratorNormalCompletion = true;
          var _didIteratorError = false;
@@ -193,6 +199,7 @@ var Mention = function () {
       key: 'onEventKeyDown',
       value: function onEventKeyDown(e) {
          this.upDownStay = e.keyCode == 40 ? 1 : e.keyCode == 38 ? -1 : 0;
+         if (this.reverse) this.upDownStay *= -1;
          if (this.upDownStay && this.showingOptions) e.preventDefault();
          if (e.keyCode == 13 && this.showingOptions) {
             e.preventDefault();
@@ -210,8 +217,8 @@ var Mention = function () {
    }, {
       key: 'onEventKeyUp',
       value: function onEventKeyUp() {
-         this.setHoverOption();
          this.cursorPositionChanged();
+         this.setHoverOption();
       }
 
       /**
@@ -333,6 +340,7 @@ var Mention = function () {
          if (!viewableOptions.length) return;
 
          this.hover = this.upDownStay ? this.hover + this.upDownStay : 0;
+         console.log(this.hover);
          if (this.hover < 0) {
             this.hover = viewableOptions.length - 1;
          }

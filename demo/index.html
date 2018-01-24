@@ -15,7 +15,12 @@
          .demo{
             display:flex;
             max-width:600px;
-            margin:auto;
+            margin:0px auto;
+         }
+
+         #optionsZone {
+            position:relative;
+            top:0px;
          }
 
          #data {
@@ -30,7 +35,6 @@
             overflow:auto;
             white-space:nowrap;
          }
-
          #textarea{
             flex:1;
             box-sizing:border-box;
@@ -56,11 +60,12 @@
    </head>
    <body>
       <h3>@ Input</h3>
+      <div id="optionsZone"></div>
       <div class="demo">
          <textarea id="textarea"></textarea>
          <textarea id="data"></textarea>
       </div>
-      <script src="../bin/mention.min.js"></script>
+      <script src="../bin/mention.js"></script>
       <script>
          var myMention = new Mention({
             input: document.querySelector('#textarea'),

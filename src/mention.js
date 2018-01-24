@@ -15,6 +15,8 @@ class Mention {
       var that = this
       this.options = settings.options || []
       this.input = settings.input
+      this.reverse = settings.reverse
+
       this.symbol = settings.symbol || '@'
       this.cursorPosition = 0
       this.hover = 0
@@ -95,6 +97,11 @@ class Mention {
       this.html.optionsList = document.createElement('div')
       this.html.optionsList.classList.add('mention-options')
       this.html.wrapper.appendChild(this.html.optionsList)
+      if(this.reverse) {
+         this.html.optionsList.classList.add('mention-options-reverse')
+         this.html.wrapper.insertBefore(this.html.optionsList, this.html.wrapper.firstChild)
+      }
+
 
       for(var option of this.options) {
          var optionElement = document.createElement('div')
@@ -133,6 +140,7 @@ class Mention {
 	*/
    onEventKeyDown(e) {
       this.upDownStay = e.keyCode == 40 ? 1 : e.keyCode == 38 ? -1 : 0
+      if(this.reverse) this.upDownStay *= -1
       if(this.upDownStay && this.showingOptions) e.preventDefault()
       if(e.keyCode == 13 && this.showingOptions) {
          e.preventDefault()
@@ -146,8 +154,8 @@ class Mention {
 	* @param {Event} e - the event passed
 	*/
    onEventKeyUp() {
-      this.setHoverOption()
       this.cursorPositionChanged()
+      this.setHoverOption()
    }
 
    /**
@@ -247,6 +255,7 @@ class Mention {
       if(!viewableOptions.length) return
 
       this.hover = this.upDownStay ? this.hover + this.upDownStay : 0
+      console.log(this.hover);
       if(this.hover < 0){ this.hover = viewableOptions.length - 1 }
       if(this.hover == viewableOptions.length) { this.hover = 0}
       viewableOptions[this.hover].classList.add('hover')
