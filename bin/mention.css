@@ -1,13 +1,13 @@
 .mention-wrapper {
   position: relative; }
   .mention-wrapper .mention-options {
-    position: absolute;
-    pointer-events: none;
-    opacity: 0;
-    color: rgba(0, 0, 0, 0.9);
-    width: 100%;
-    border: 3px solid transparent;
     box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    pointer-events: none;
+    background: #FFF;
+    color: #333;
     display: flex;
     flex-wrap: wrap; }
     .mention-wrapper .mention-options.mention-options-reverse {
@@ -15,7 +15,6 @@
       top: initial;
       bottom: 100%; }
     .mention-wrapper .mention-options .mention-option {
-      padding: 5px 10px;
       box-sizing: border-box;
       background: #FFF;
       position: relative;
