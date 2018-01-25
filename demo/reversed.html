@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+   <head>
+      <link rel="stylesheet" href="../bin/mention.css">
+      <link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+      <style>
+         html, body{
+            font-family: 'PT Mono', monospace;
+            height:100%;
+            background:#444;
+         }
+
+         h1{
+            text-align:center;
+            color:#FFF;
+         }
+         .data {
+            tab-size: 16px;
+            font-size: 12px;
+            overflow: auto;
+            color:#FFF;
+            flex:1;
+            padding:5px;
+         }
+         .container {
+            display:flex;
+            flex-direction:column;
+            max-width:250px;
+            margin:auto;
+            height:350px;
+            background:#222;
+            border-radius: 3px;
+            box-shadow:0px 2px 4px rgba(0, 0, 0, 0.25);
+            position:relative;
+         }
+
+         #textarea {
+            width:100%;
+            min-height:100%;
+            box-sizing:border-box;
+            padding:10px;
+            outline:none;
+            ccborder: 3px solid transparent;
+            font-size:16px;
+         }
+
+         #textarea:focus{
+         }
+
+         .mention-wrapper {
+            box-sizing:border-box;
+            border:3px solid #888;
+            bottom:0px;
+            height:80px;
+            border-radius:0px 0px 3px 3px;
+         }
+
+         .mention-wrapper .mention-options{
+             position:absolute;
+             bottom: 77px !important;
+             width: calc(100% + 6px);
+             margin-left: -3px;
+         }
+
+         .mention-option {
+            padding: 10px;
+         }
+      </style>
+   </head>
+   <body>
+      <h1>@ Mention</h1>
+      <div class="container">
+         <pre class="data"></pre>
+         <textarea id="textarea" ></textarea>
+      </div>
+      <script src="../bin/mention.js"></script>
+      <script>
+         var myMention = new Mention({
+            input: document.querySelector('#textarea'),
+            reverse: true,
+            options: [
+               { id: 2, name: 'WideEye', description: 'Wideeye Potion' },
+               { id: 100, name: 'LiquidLuck', description: 'Felix Felicis' },
+               { id: 10, name: 'PolyJuice', description: 'Polyjuice Potion' }
+            ],
+            update: function() {
+               document.querySelector('.data').innerHTML = JSON.stringify(this.collect(), null, '\t')
+            }
+         })
+      </script>
+   </body>
+</html>
