@@ -125,17 +125,17 @@ tape('replacing Input Value with HTML', (test) => {
    var mention = new Mention(settings)
    mention.html.input.value = '@one'
    mention.updateDisplay()
-   var expected = '<u mentiondata="&quot;one&quot;">@one</u>&nbsp;'
+   var expected = '<u mentiondata="&quot;one&quot;">@one</u>'
    test.equal(mention.html.display.innerHTML, expected, 'One match one <u> element with nbsp')
 
    mention.html.input.value = '@one @one'
    mention.updateDisplay()
-   var expected = '<u mentiondata="&quot;one&quot;">@one</u> <u mentiondata="&quot;one&quot;">@one</u>&nbsp;'
+   var expected = '<u mentiondata="&quot;one&quot;">@one</u> <u mentiondata="&quot;one&quot;">@one</u>'
    test.equal(mention.html.display.innerHTML, expected, 'Two matches two <u> element with nbsp')
 
    mention.html.input.value = '@one \n @two'
    mention.updateDisplay()
-   var expected = '<u mentiondata="&quot;one&quot;">@one</u> \n <u mentiondata="&quot;two&quot;">@two</u>&nbsp;'
+   var expected = '<u mentiondata="&quot;one&quot;">@one</u> \n <u mentiondata="&quot;two&quot;">@two</u>'
    test.equal(mention.html.display.innerHTML, expected, 'Two matches two <u> element with line break')
 
    test.end()
