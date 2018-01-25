@@ -57,7 +57,7 @@ var Mention = function () {
       key: 'defaultMatchFunction',
       value: function defaultMatchFunction(word, option) {
          var optionText = option.name || option;
-         return !word.length || optionText.startsWith(word.replace('@', ''));
+         return !word.length || optionText.toLowerCase().startsWith(word.replace('@', '').toLowerCase());
       }
 
       /**
@@ -81,17 +81,29 @@ var Mention = function () {
       value: function setupHTML() {
          this.html.input = this.input;
          var computedStyleInput = window.getComputedStyle(this.html.input, "");
+         var styleInput = function styleInput(prop) {
+            return computedStyleInput.getPropertyValue(prop);
+         };
+         var numStyleInput = function numStyleInput(prop) {
+            return parseInt(styleInput(prop));
+         };
+
+         // Global wrapper
          this.html.wrapper = document.createElement('div');
          this.html.wrapper.classList.add('mention-wrapper');
-         this.html.wrapper.style.position = 'relative';
          this.html.wrapper.style.width = computedStyleInput.getPropertyValue('width');
+         this.html.input.parentElement.insertBefore(this.html.wrapper, this.html.input);
 
+         // Text/Display Wrapper
+         this.html.textWrapper = document.createElement('div');
+         this.html.textWrapper.classList.add('mention-textwrapper');
+         this.html.wrapper.appendChild(this.html.textWrapper);
+
+         // Inputs
          this.html.display = document.createElement('div');
          this.html.display.classList.add('mention-display');
-         this.html.input.parentElement.insertBefore(this.html.wrapper, this.html.input);
-         this.html.wrapper.appendChild(this.html.input);
-         this.html.wrapper.appendChild(this.html.display);
-
+         this.html.textWrapper.appendChild(this.html.input);
+         this.html.textWrapper.appendChild(this.html.display);
          for (var prop in computedStyleInput) {
             try {
                this.html.display.style[prop] = computedStyleInput[prop];
@@ -103,9 +115,11 @@ var Mention = function () {
                this.html.display.style.paddingTop = parseInt(computedStyleInput.getPropertyValue('padding-top')) + 3 + 'px';
             }
          }
+         this.html.display.style.padding = numStyleInput('padding-top') + numStyleInput('border-width') + 'px';
          this.html.display.style.wordBreak = 'break-word';
          this.html.display.style.wordWrap = 'break-word';
          this.html.display.style.background = 'transparent';
+         this.html.display.style.border = 'none';
          this.html.display.style.pointerEvents = "none";
          this.html.display.style.position = "absolute";
          this.html.display.style.left = '0px';
@@ -114,6 +128,7 @@ var Mention = function () {
          this.html.input.style.width = '100%';
          this.html.display.style.height = 'fit-content';
 
+         // Options
          this.html.optionsList = document.createElement('div');
          this.html.optionsList.classList.add('mention-options');
          this.html.wrapper.appendChild(this.html.optionsList);
@@ -171,6 +186,9 @@ var Mention = function () {
          this.html.input.addEventListener('keyup', function (e) {
             _this.onEventKeyUp(e);
          });
+         this.html.textWrapper.addEventListener('scroll', function (e) {
+            _this.onEventScroll(e);
+         });
          this.html.options.forEach(function (o) {
             o.addEventListener('click', function (e) {
                _this.onEventOptionClick(e.target);
@@ -203,9 +221,10 @@ var Mention = function () {
          if (this.upDownStay && this.showingOptions) e.preventDefault();
          if (e.keyCode == 13 && this.showingOptions) {
             e.preventDefault();
-            this.onEventOptionClick(this.html.options.find(function (e) {
+            var option = this.html.options.find(function (e) {
                return e.classList.contains('hover');
-            }));
+            });
+            if (option) this.onEventOptionClick(option);
          }
       }
 
@@ -238,6 +257,10 @@ var Mention = function () {
          this.toggleOptions(false);
          this.update();
       }
+   }, {
+      key: 'onEventScroll',
+      value: function onEventScroll() {}
+      //this.html.display.style.top = -this.html.textWrapper.scrollTop + 'px'
 
       /**
       * Cursor position changed. Check for input data and toggle options
@@ -264,8 +287,8 @@ var Mention = function () {
          // Fix the html styles
          var computedStylesInput = window.getComputedStyle(this.html.input);
          var minHeight = parseInt(computedStylesInput.getPropertyValue('min-height'));
-         minHeight += parseInt(computedStylesInput.getPropertyValue('padding-bottom'));
-         minHeight += parseInt(computedStylesInput.getPropertyValue('border-width')) / 2;
+         //minHeight += parseInt(computedStylesInput.getPropertyValue('padding-bottom'))
+         //minHeight += parseInt(computedStylesInput.getPropertyValue('border-width'))/2
          if (minHeight < this.html.display.offsetHeight) minHeight = this.html.display.offsetHeight;
          this.html.input.style.height = minHeight + 'px';
       }
@@ -337,7 +360,10 @@ var Mention = function () {
             e.classList.remove('hover');
             return e.classList.contains('show');
          });
-         if (!viewableOptions.length) return;
+         if (!viewableOptions.length) {
+            this.toggleOptions(false);
+            return;
+         }
 
          this.hover = this.upDownStay ? this.hover + this.upDownStay : 0;
          if (this.hover < 0) {
@@ -464,7 +490,7 @@ var Mention = function () {
          }
 
          inputValue = inputValue.join('');
-         if (inputValue[inputValue.length - 1] != ' ') inputValue += '&nbsp;';
+         if (inputValue[inputValue.length - 1] == '\n') inputValue += ' ';
          return inputValue;
       }
 
@@ -495,6 +521,17 @@ var Mention = function () {
          }
 
          return words;
+      }
+
+      /**
+      * Removes the HTML and listeners
+      */
+
+   }, {
+      key: 'numStyle',
+      value: function numStyle(ele, propertyName) {
+         var computedStylesInput = window.getComputedStyle(ele);
+         return parseInt(computedStylesInput.getPropertyValue(propertyName));
       }
 
       /**
