@@ -1,7 +1,12 @@
 .mention-wrapper {
   position: relative; }
-  .mention-wrapper textarea {
-    resize: none; }
+  .mention-wrapper .mention-textwrapper {
+    height: 100%;
+    overflow: auto;
+    position: relative; }
+    .mention-wrapper .mention-textwrapper textarea {
+      resize: none;
+      float: left; }
   .mention-wrapper .mention-options {
     box-sizing: border-box;
     position: absolute;

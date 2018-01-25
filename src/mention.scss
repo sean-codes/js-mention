@@ -1,8 +1,14 @@
 .mention-wrapper {
    position:relative;
 
-   textarea {
-      resize:none;
+   .mention-textwrapper {
+      height:100%;
+      overflow:auto;
+      position:relative;
+      textarea {
+         resize:none;
+         float:left;
+      }
    }
    .mention-options {
       box-sizing:border-box;
