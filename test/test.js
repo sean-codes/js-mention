@@ -19,8 +19,8 @@ tape('HTML is setup', (test) => {
    test.ok(mention.html.wrapper, 'Wrapper exists')
    test.ok(mention.html.display, 'Display exists')
    test.ok(mention.html.optionsList, 'Options exist')
-   test.equal(mention.html.input.parentElement, mention.html.wrapper, 'Input inside wrapper')
-   test.equal(mention.html.display.parentElement, mention.html.wrapper, 'Display inside wrapper')
+   test.equal(mention.html.input.parentElement, mention.html.textWrapper, 'Input inside wrapper')
+   test.equal(mention.html.display.parentElement, mention.html.textWrapper, 'Display inside wrapper')
    test.equal(mention.html.options.filter((e, i) => {
       return e.innerHTML == settings.options[i]
    }).length, 3, 'Options match settings')
