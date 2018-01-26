@@ -113,7 +113,7 @@ var Mention = function () {
          if (/iPhone|iPad|iPod|Edge/i.test(navigator.userAgent)) {
             this.html.display.style.paddingLeft = numStyleInput('padding-top') + numStyleInput('border-width') + 3 + 'px';
             if (navigator.userAgent.includes('Edge')) {
-               this.html.display.style.paddingTop = parseInt(computedStyleInput.getPropertyValue('padding-top')) + 3 + 'px';
+               this.html.display.style.paddingTop = numStyleInput('padding-top') + numStyleInput('border-width') + 3 + 'px';
             }
          }
          this.html.display.style.wordBreak = 'break-word';
