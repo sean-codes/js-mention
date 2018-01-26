@@ -1,15 +1,13 @@
 .mention-wrapper {
-  position: relative; }
-  .mention-wrapper .mention-textwrapper {
-    height: 100%;
-    overflow: auto;
-    position: relative; }
-    .mention-wrapper .mention-textwrapper textarea {
-      ccoverflow: hidden;
-      border-radius: 0px;
-      margin: 0px;
-      resize: none;
-      float: left; }
+  position: relative;
+  display: inline-block; }
+  .mention-wrapper textarea {
+    border-radius: 0px;
+    margin: 0px;
+    resize: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%; }
   .mention-wrapper .mention-options {
     box-sizing: border-box;
     position: absolute;

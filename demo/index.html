@@ -37,16 +37,15 @@
             height:50px;
          }
          .mention-wrapper {
-            border:3px solid #444;
-            border-radius:4px;
+            width:50%;
          }
          #textarea{
+            border-radius:4px;
             min-height:100%;
             flex:1;
             box-sizing:border-box;
             background:#FFF;
             display:block;
-            width:50%;
             margin:0;
             resize:none;
             padding:10px;
@@ -54,13 +53,18 @@
             color:#333;
             font-size:16px;
 				font-family: 'Karla', sans-serif;
+            border:3px solid transparent;
 
+         }
+         #textarea:focus{
+            border:3px solid #999;
          }
 
          .mention-options {
-            margin-top:-3px;
             border:3px solid #999;
+            margin-top:-3px;
          }
+
          .mention-option {
             padding:5px 10px;
          }

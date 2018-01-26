@@ -32,8 +32,8 @@ var Mention = function () {
       this.upDownStay = 0;
       this.wordAtCursor = {};
       this.update = settings.update || function () {};
-      this.match = settings.match || this.defaultMatchFunction;
-      this.template = settings.template || this.defaultTemplateFunction;
+      this.match = settings.match || this.match;
+      this.template = settings.template || this.template;
       this.html = {
          input: undefined,
          display: undefined,
@@ -54,8 +54,8 @@ var Mention = function () {
 
 
    _createClass(Mention, [{
-      key: 'defaultMatchFunction',
-      value: function defaultMatchFunction(word, option) {
+      key: 'match',
+      value: function match(word, option) {
          var optionText = option.name || option;
          return !word.length || optionText.toLowerCase().startsWith(word.replace('@', '').toLowerCase());
       }
@@ -67,8 +67,8 @@ var Mention = function () {
       */
 
    }, {
-      key: 'defaultTemplateFunction',
-      value: function defaultTemplateFunction(option) {
+      key: 'template',
+      value: function template(option) {
          return option.name || option;
       }
 
@@ -80,53 +80,12 @@ var Mention = function () {
       key: 'setupHTML',
       value: function setupHTML() {
          this.html.input = this.input;
-         var computedStyleInput = window.getComputedStyle(this.html.input, null);
-         var styleInput = function styleInput(prop) {
-            return computedStyleInput.getPropertyValue(prop);
-         };
-         var numStyleInput = function numStyleInput(prop) {
-            return parseInt(styleInput(prop)) || 0;
-         };
 
          // Global wrapper
          this.html.wrapper = document.createElement('div');
          this.html.wrapper.classList.add('mention-wrapper');
-         this.html.wrapper.style.width = computedStyleInput.getPropertyValue('width');
          this.html.input.parentElement.insertBefore(this.html.wrapper, this.html.input);
-
-         // Text/Display Wrapper
-         this.html.textWrapper = document.createElement('div');
-         this.html.textWrapper.classList.add('mention-textwrapper');
-         this.html.wrapper.appendChild(this.html.textWrapper);
-
-         // Inputs
-         this.html.display = document.createElement('div');
-         this.html.display.classList.add('mention-display');
-         this.html.textWrapper.appendChild(this.html.input);
-         this.html.textWrapper.appendChild(this.html.display);
-         for (var prop in computedStyleInput) {
-            try {
-               this.html.display.style[prop] = computedStyleInput[prop];
-            } catch (e) {}
-         }
-         this.html.display.style.padding = numStyleInput('padding-top') + numStyleInput('border-width') + 'px';
-         if (/iPhone|iPad|iPod|Edge/i.test(navigator.userAgent)) {
-            this.html.display.style.paddingLeft = numStyleInput('padding-top') + numStyleInput('border-width') + 3 + 'px';
-            if (navigator.userAgent.includes('Edge')) {
-               //this.html.display.style.paddingTop = numStyleInput('padding-top') + numStyleInput('border-width') + 3 + 'px'
-            }
-         }
-         this.html.display.style.wordBreak = 'break-word';
-         this.html.display.style.wordWrap = 'break-word';
-         this.html.display.style.background = 'transparent';
-         this.html.display.style.border = 'none';
-         this.html.display.style.pointerEvents = "none";
-         this.html.display.style.position = "absolute";
-         this.html.display.style.left = '0px';
-         this.html.display.style.top = '0px';
-         this.html.display.style.width = '100%';
-         this.html.input.style.width = '100%';
-         this.html.display.style.height = 'fit-content';
+         this.html.wrapper.appendChild(this.html.input);
 
          // Options
          this.html.optionsList = document.createElement('div');
@@ -186,9 +145,6 @@ var Mention = function () {
          this.html.input.addEventListener('keyup', function (e) {
             _this.onEventKeyUp(e);
          });
-         this.html.textWrapper.addEventListener('scroll', function (e) {
-            _this.onEventScroll(e);
-         });
          this.html.options.forEach(function (o) {
             o.addEventListener('click', function (e) {
                _this.onEventOptionClick(e.target);
@@ -204,7 +160,6 @@ var Mention = function () {
    }, {
       key: 'onEventInput',
       value: function onEventInput() {
-         this.updateDisplay();
          this.update();
       }
 
@@ -253,7 +208,6 @@ var Mention = function () {
          this.html.input.value = splitInputValue.join('');
          this.html.input.focus();
          this.setCursorPosition(this.wordAtCursor.index + word.length + 1);
-         this.updateDisplay();
          this.toggleOptions(false);
          this.update();
       }
@@ -273,24 +227,6 @@ var Mention = function () {
          this.wordAtCursor = this.readWordAtCursor({ cursorPosition: this.cursorPosition, value: this.input.value });
          this.toggleOptions(this.wordAtCursor.word.length && this.wordAtCursor.word[0] == this.symbol);
          this.optionsMatch();
-      }
-
-      /**
-      * Updates the display (finds mentions and underlines/bolds them)
-      */
-
-   }, {
-      key: 'updateDisplay',
-      value: function updateDisplay() {
-         this.html.display.innerHTML = this.convertInputValueToHTML();
-
-         // Fix the html styles
-         var computedStylesInput = window.getComputedStyle(this.html.input);
-         var minHeight = parseInt(computedStylesInput.getPropertyValue('min-height'));
-         //minHeight += parseInt(computedStylesInput.getPropertyValue('padding-bottom'))
-         //minHeight += parseInt(computedStylesInput.getPropertyValue('border-width'))/2
-         if (minHeight < this.html.display.offsetHeight) minHeight = this.html.display.offsetHeight;
-         this.html.input.style.height = minHeight + 'px';
       }
 
       /**
@@ -388,113 +324,6 @@ var Mention = function () {
       }
 
       /**
-      * Returns the mentions form the input. Returns the value of the option with its properties
-      */
-
-   }, {
-      key: 'collect',
-      value: function collect() {
-         var data = [];
-         var added = this.html.display.querySelectorAll('u');
-         var _iteratorNormalCompletion2 = true;
-         var _didIteratorError2 = false;
-         var _iteratorError2 = undefined;
-
-         try {
-            for (var _iterator2 = added[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-               var add = _step2.value;
-
-               data.push(JSON.parse(add.getAttribute('mentiondata')));
-            }
-         } catch (err) {
-            _didIteratorError2 = true;
-            _iteratorError2 = err;
-         } finally {
-            try {
-               if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                  _iterator2.return();
-               }
-            } finally {
-               if (_didIteratorError2) {
-                  throw _iteratorError2;
-               }
-            }
-         }
-
-         return data;
-      }
-
-      /**
-      * Loops through the word matches and replaces them with underlines
-      * @returns {string} the input value in an html form
-      */
-
-   }, {
-      key: 'convertInputValueToHTML',
-      value: function convertInputValueToHTML() {
-         var words = this.findMatches();
-         var inputValue = this.html.input.value.split('');
-         var _iteratorNormalCompletion3 = true;
-         var _didIteratorError3 = false;
-         var _iteratorError3 = undefined;
-
-         try {
-            for (var _iterator3 = words[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-               var word = _step3.value;
-               var _iteratorNormalCompletion4 = true;
-               var _didIteratorError4 = false;
-               var _iteratorError4 = undefined;
-
-               try {
-                  for (var _iterator4 = this.options[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                     var option = _step4.value;
-
-                     if (this.symbol + (option.name || option) == word.word) {
-                        var optionHTML = document.createElement('u');
-                        optionHTML.innerHTML = word.word;
-                        optionHTML.setAttribute('mentiondata', JSON.stringify(option));
-
-                        inputValue.splice(word.index, word.word.length, optionHTML.outerHTML);
-                     }
-                  }
-               } catch (err) {
-                  _didIteratorError4 = true;
-                  _iteratorError4 = err;
-               } finally {
-                  try {
-                     if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                        _iterator4.return();
-                     }
-                  } finally {
-                     if (_didIteratorError4) {
-                        throw _iteratorError4;
-                     }
-                  }
-               }
-            }
-
-            // Replace Line breaks and spaces with HTML
-         } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
-         } finally {
-            try {
-               if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                  _iterator3.return();
-               }
-            } finally {
-               if (_didIteratorError3) {
-                  throw _iteratorError3;
-               }
-            }
-         }
-
-         inputValue = inputValue.join('');
-         if (inputValue[inputValue.length - 1] == '\n') inputValue += ' ';
-         return inputValue;
-      }
-
-      /**
       * Loops over the input value.
       * @return {match[]} - Array of matches { word: word, index: index word is at}
       */
@@ -522,25 +351,6 @@ var Mention = function () {
 
          return words;
       }
-
-      /**
-      * Removes the HTML and listeners
-      */
-
-   }, {
-      key: 'numStyle',
-      value: function numStyle(ele, propertyName) {
-         var computedStylesInput = window.getComputedStyle(ele);
-         return parseInt(computedStylesInput.getPropertyValue(propertyName));
-      }
-
-      /**
-      * Removes the HTML and listeners
-      */
-
-   }, {
-      key: 'deconctruct',
-      value: function deconctruct() {}
    }]);
 
    return Mention;

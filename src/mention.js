@@ -24,8 +24,8 @@ class Mention {
       this.upDownStay = 0
       this.wordAtCursor = {}
       this.update = settings.update || function(){}
-      this.match = settings.match || this.defaultMatchFunction
-      this.template = settings.template || this.defaultTemplateFunction
+      this.match = settings.match || this.match
+      this.template = settings.template || this.template
       this.html = {
          input: undefined,
          display: undefined,
@@ -43,7 +43,7 @@ class Mention {
 	* @param {String} [option] - The options being looped
 	* @return {boolean} - If the word matches the option
 	*/
-   defaultMatchFunction(word, option) {
+   match(word, option) {
       var optionText = option.name || option
       return (!word.length || optionText.toLowerCase().startsWith(word.replace('@', '').toLowerCase()))
    }
@@ -53,7 +53,7 @@ class Mention {
 	* @param {String} [option] - The options being looped
 	* @return {String} - The innerHTM
 	*/
-   defaultTemplateFunction(option) {
+   template(option) {
       return option.name || option
    }
 
@@ -62,47 +62,12 @@ class Mention {
 	*/
 	setupHTML() {
       this.html.input = this.input
-      var computedStyleInput = window.getComputedStyle(this.html.input, null)
-      var styleInput = (prop) => { return computedStyleInput.getPropertyValue(prop) }
-      var numStyleInput = (prop) => { return parseInt(styleInput(prop)) || 0 }
 
       // Global wrapper
       this.html.wrapper = document.createElement('div')
       this.html.wrapper.classList.add('mention-wrapper')
-      this.html.wrapper.style.width = computedStyleInput.getPropertyValue('width')
       this.html.input.parentElement.insertBefore(this.html.wrapper, this.html.input)
-
-      // Text/Display Wrapper
-      this.html.textWrapper = document.createElement('div')
-      this.html.textWrapper.classList.add('mention-textwrapper')
-      this.html.wrapper.appendChild(this.html.textWrapper)
-
-      // Inputs
-      this.html.display = document.createElement('div')
-      this.html.display.classList.add('mention-display')
-      this.html.textWrapper.appendChild(this.html.input)
-      this.html.textWrapper.appendChild(this.html.display)
-      for(var prop in computedStyleInput){
-         try { this.html.display.style[prop] = computedStyleInput[prop] } catch(e) { }
-      }
-      this.html.display.style.padding = numStyleInput('padding-top') + numStyleInput('border-width') + 'px'
-      if(/iPhone|iPad|iPod|Edge/i.test(navigator.userAgent)){
-         this.html.display.style.paddingLeft = numStyleInput('padding-top') + numStyleInput('border-width') + 3 + 'px'
-         if(navigator.userAgent.includes('Edge')){
-            //this.html.display.style.paddingTop = numStyleInput('padding-top') + numStyleInput('border-width') + 3 + 'px'
-         }
-      }
-      this.html.display.style.wordBreak = 'break-word'
-      this.html.display.style.wordWrap = 'break-word'
-      this.html.display.style.background = 'transparent'
-      this.html.display.style.border = 'none'
-      this.html.display.style.pointerEvents = "none"
-      this.html.display.style.position = "absolute"
-      this.html.display.style.left = '0px'
-      this.html.display.style.top = '0px'
-      this.html.display.style.width = '100%';
-      this.html.input.style.width = '100%'
-      this.html.display.style.height = 'fit-content'
+      this.html.wrapper.appendChild(this.html.input)
 
       // Options
       this.html.optionsList = document.createElement('div')
@@ -131,7 +96,6 @@ class Mention {
       this.html.input.addEventListener('input', () => { this.onEventInput() })
       this.html.input.addEventListener('keydown', (e) => { this.onEventKeyDown(e) })
       this.html.input.addEventListener('keyup', (e) => { this.onEventKeyUp(e) })
-      this.html.textWrapper.addEventListener('scroll', (e) => { this.onEventScroll(e) })
       this.html.options.forEach((o) => {
          o.addEventListener('click', (e) => { this.onEventOptionClick(e.target) })
       })
@@ -142,7 +106,6 @@ class Mention {
 	* @param {Event} e - the event passed
 	*/
 	onEventInput() {
-		this.updateDisplay()
       this.update()
 	}
 
@@ -180,7 +143,6 @@ class Mention {
       this.html.input.value = splitInputValue.join('')
       this.html.input.focus()
       this.setCursorPosition(this.wordAtCursor.index + word.length + 1)
-      this.updateDisplay()
       this.toggleOptions(false)
       this.update()
    }
@@ -196,21 +158,6 @@ class Mention {
 		this.wordAtCursor = this.readWordAtCursor({ cursorPosition: this.cursorPosition, value: this.input.value })
       this.toggleOptions(this.wordAtCursor.word.length && this.wordAtCursor.word[0] == this.symbol)
 		this.optionsMatch()
-   }
-
-	/**
-	* Updates the display (finds mentions and underlines/bolds them)
-	*/
-   updateDisplay() {
-      this.html.display.innerHTML = this.convertInputValueToHTML()
-
-      // Fix the html styles
-      var computedStylesInput = window.getComputedStyle(this.html.input)
-      var minHeight = parseInt(computedStylesInput.getPropertyValue('min-height'))
-      //minHeight += parseInt(computedStylesInput.getPropertyValue('padding-bottom'))
-      //minHeight += parseInt(computedStylesInput.getPropertyValue('border-width'))/2
-      if( minHeight < this.html.display.offsetHeight) minHeight = this.html.display.offsetHeight
-      this.html.input.style.height = minHeight + 'px'
    }
 
 	/**
@@ -287,43 +234,6 @@ class Mention {
       this.html.input.setSelectionRange(position, position);
    }
 
-	/**
-	* Returns the mentions form the input. Returns the value of the option with its properties
-	*/
-   collect() {
-      var data = []
-      var added = this.html.display.querySelectorAll('u')
-      for(var add of added) {
-         data.push(JSON.parse(add.getAttribute('mentiondata')))
-      }
-      return data
-   }
-
-   /**
-   * Loops through the word matches and replaces them with underlines
-   * @returns {string} the input value in an html form
-   */
-   convertInputValueToHTML() {
-      var words = this.findMatches()
-      var inputValue = this.html.input.value.split('')
-      for(var word of words) {
-         for(var option of this.options) {
-            if(this.symbol+(option.name || option) == word.word) {
-               var optionHTML = document.createElement('u')
-               optionHTML.innerHTML = word.word
-               optionHTML.setAttribute('mentiondata', JSON.stringify(option))
-
-               inputValue.splice(word.index, word.word.length, optionHTML.outerHTML)
-            }
-         }
-      }
-
-      // Replace Line breaks and spaces with HTML
-      inputValue = inputValue.join('')
-      if(inputValue[inputValue.length-1] == '\n') inputValue += ' '
-      return inputValue
-   }
-
    /**
 	* Loops over the input value.
    * @return {match[]} - Array of matches { word: word, index: index word is at}
@@ -348,20 +258,6 @@ class Mention {
       }
 
       return words
-   }
-
-   /**
-	* Removes the HTML and listeners
-	*/
-   numStyle(ele, propertyName) {
-      var computedStylesInput = window.getComputedStyle(ele)
-      return parseInt(computedStylesInput.getPropertyValue(propertyName))
-   }
-
-   /**
-	* Removes the HTML and listeners
-	*/
-   deconctruct() {
    }
 }
 

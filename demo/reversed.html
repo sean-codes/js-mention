@@ -33,34 +33,31 @@
             border-radius: 3px;
             box-shadow:0px 2px 4px rgba(0, 0, 0, 0.25);
             position:relative;
+            vborder-radius:3px;
          }
 
          #textarea {
-            width:100%;
-            min-height:100%;
-            box-sizing:border-box;
             padding:10px;
             outline:none;
-            ccborder: 3px solid transparent;
+            border: 3px solid transparent;
             font-size:16px;
          }
 
          #textarea:focus{
+            border:3px solid #888;
+            box-sizing:border-box;
+            border-radius:0px 0px 3px 3px;
          }
 
          .mention-wrapper {
-            box-sizing:border-box;
-            border:3px solid #888;
-            bottom:0px;
             height:80px;
-            border-radius:0px 0px 3px 3px;
+            bottom:0px;
          }
 
          .mention-wrapper .mention-options{
              position:absolute;
-             bottom: 77px !important;
-             width: calc(100% + 6px);
-             margin-left: -3px;
+             ccbottom: 77px !important;
+             width: 100%;
          }
 
          .mention-option {
@@ -72,7 +69,7 @@
       <h1>@ Mention</h1>
       <div class="container">
          <pre class="data"></pre>
-         <textarea id="textarea" ></textarea>
+         <textarea id="textarea" placeholder="Type @ to bring up mention!"></textarea>
       </div>
       <script src="../bin/mention.js"></script>
       <script>
@@ -85,7 +82,7 @@
                { id: 10, name: 'PolyJuice', description: 'Polyjuice Potion' }
             ],
             update: function() {
-               document.querySelector('.data').innerHTML = JSON.stringify(this.collect(), null, '\t')
+               //document.querySelector('.data').innerHTML = JSON.stringify(this.collect(), null, '\t')
             }
          })
       </script>

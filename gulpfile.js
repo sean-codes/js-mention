@@ -8,7 +8,7 @@ var tapSpec = require('tap-spec')
 var run = require('tape-run')
 
 // Defauklt / Watch
-gulp.task('default', ['css', 'js', 'compress', 'test'])
+gulp.task('default', ['css', 'js', 'compress'])
 gulp.task('watch', function() {
    gulp.watch(['./src/**/*', './test/test.js'], ['default'])
 })
