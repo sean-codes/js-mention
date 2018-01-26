@@ -161,30 +161,6 @@ class Mention {
    }
 
 	/**
-	* From the cursor positoin looks back to match the work and start/end position
-	* @param {Object} data - Options to initialize the component with
-	* @param {String} [data.value] - the string to search through
-	* @param {Number} [data.cursorPosition] - The position of the cursor in the string
-	*/
-   readWordAtCursor(data) {
-      var word = '', index = data.cursorPosition
-      var valueWithReplacedSpecial = data.value.replace(/\n/g, ' ');
-
-      while(index--){
-         var previousCharacter = valueWithReplacedSpecial[index]
-         if(previousCharacter == ' ' || index < 0) break
-      }
-
-      while(index++ < valueWithReplacedSpecial.length-1) {
-         var nextCharacter = valueWithReplacedSpecial[index]
-         if(nextCharacter == ' ') break
-         word += nextCharacter
-      }
-
-      return { index: Math.max(index-word.length, 0), word: word }
-   }
-
-	/**
 	* Show/Hide the options list
 	* @param {Boolean} toggle - show or hide
 	*/
@@ -234,6 +210,7 @@ class Mention {
       this.html.input.setSelectionRange(position, position);
    }
 
+
    /**
 	* Loops over the input value.
    * @return {match[]} - Array of matches { word: word, index: index word is at}
@@ -258,6 +235,30 @@ class Mention {
       }
 
       return words
+   }
+
+   /**
+	* From the cursor positoin looks back to match the work and start/end position
+	* @param {Object} data - Options to initialize the component with
+	* @param {String} [data.value] - the string to search through
+	* @param {Number} [data.cursorPosition] - The position of the cursor in the string
+	*/
+   readWordAtCursor(data) {
+      var word = '', index = data.cursorPosition
+      var valueWithReplacedSpecial = data.value.replace(/\n/g, ' ');
+
+      while(index--){
+         var previousCharacter = valueWithReplacedSpecial[index]
+         if(previousCharacter == ' ' || index < 0) break
+      }
+
+      while(index++ < valueWithReplacedSpecial.length-1) {
+         var nextCharacter = valueWithReplacedSpecial[index]
+         if(nextCharacter == ' ') break
+         word += nextCharacter
+      }
+
+      return { index: Math.max(index-word.length, 0), word: word }
    }
 }
 

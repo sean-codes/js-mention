@@ -230,34 +230,6 @@ var Mention = function () {
       }
 
       /**
-      * From the cursor positoin looks back to match the work and start/end position
-      * @param {Object} data - Options to initialize the component with
-      * @param {String} [data.value] - the string to search through
-      * @param {Number} [data.cursorPosition] - The position of the cursor in the string
-      */
-
-   }, {
-      key: 'readWordAtCursor',
-      value: function readWordAtCursor(data) {
-         var word = '',
-             index = data.cursorPosition;
-         var valueWithReplacedSpecial = data.value.replace(/\n/g, ' ');
-
-         while (index--) {
-            var previousCharacter = valueWithReplacedSpecial[index];
-            if (previousCharacter == ' ' || index < 0) break;
-         }
-
-         while (index++ < valueWithReplacedSpecial.length - 1) {
-            var nextCharacter = valueWithReplacedSpecial[index];
-            if (nextCharacter == ' ') break;
-            word += nextCharacter;
-         }
-
-         return { index: Math.max(index - word.length, 0), word: word };
-      }
-
-      /**
       * Show/Hide the options list
       * @param {Boolean} toggle - show or hide
       */
@@ -350,6 +322,34 @@ var Mention = function () {
          }
 
          return words;
+      }
+
+      /**
+      * From the cursor positoin looks back to match the work and start/end position
+      * @param {Object} data - Options to initialize the component with
+      * @param {String} [data.value] - the string to search through
+      * @param {Number} [data.cursorPosition] - The position of the cursor in the string
+      */
+
+   }, {
+      key: 'readWordAtCursor',
+      value: function readWordAtCursor(data) {
+         var word = '',
+             index = data.cursorPosition;
+         var valueWithReplacedSpecial = data.value.replace(/\n/g, ' ');
+
+         while (index--) {
+            var previousCharacter = valueWithReplacedSpecial[index];
+            if (previousCharacter == ' ' || index < 0) break;
+         }
+
+         while (index++ < valueWithReplacedSpecial.length - 1) {
+            var nextCharacter = valueWithReplacedSpecial[index];
+            if (nextCharacter == ' ') break;
+            word += nextCharacter;
+         }
+
+         return { index: Math.max(index - word.length, 0), word: word };
       }
    }]);
 
