@@ -12,7 +12,6 @@ class Mention {
 	* @param {Function} [settings.template] - The template function outputs the innerHTML of the optionlist {@link Component#template}
 	*/
    constructor(settings) {
-      var that = this
       this.options = settings.options || []
       this.input = settings.input
       this.reverse = settings.reverse
@@ -26,6 +25,7 @@ class Mention {
       this.update = settings.update || function(){}
       this.match = settings.match || this.match
       this.template = settings.template || this.template
+      this.startsWith = settings.startsWith || this.startsWith
       this.html = {
          input: undefined,
          display: undefined,
@@ -45,7 +45,18 @@ class Mention {
 	*/
    match(word, option) {
       var optionText = option.name || option
-      return (!word.length || optionText.toLowerCase().startsWith(word.replace('@', '').toLowerCase()))
+      return optionText.toLowerCase() == word.toLowerCase()
+   }
+
+	/**
+	* Called to see if option starts with the word
+	* @param {String} [word] - The current word ex. @test
+	* @param {String} [option] - The options being looped
+	* @return {boolean} - If the word starts with the option
+	*/
+   startsWith(word, option) {
+      var optionText = option.name || option
+      return optionText.toLowerCase().startsWith(word.toLowerCase())
    }
 
 	/**
@@ -77,7 +88,6 @@ class Mention {
          this.html.optionsList.classList.add('mention-options-reverse')
          this.html.wrapper.insertBefore(this.html.optionsList, this.html.wrapper.firstChild)
       }
-
 
       for(var option of this.options) {
          var optionElement = document.createElement('div')
@@ -143,28 +153,25 @@ class Mention {
       this.html.input.value = splitInputValue.join('')
       this.html.input.focus()
       this.setCursorPosition(this.wordAtCursor.index + word.length + 1)
-      this.toggleOptions(false)
+      this.toggleOptionList(false)
       this.update()
    }
 
-   onEventScroll() {
-      //this.html.display.style.top = -this.html.textWrapper.scrollTop + 'px'
-   }
    /**
    * Cursor position changed. Check for input data and toggle options
    */
    cursorPositionChanged() {
       this.cursorPosition = this.html.input.selectionStart
 		this.wordAtCursor = this.readWordAtCursor({ cursorPosition: this.cursorPosition, value: this.input.value })
-      this.toggleOptions(this.wordAtCursor.word.length && this.wordAtCursor.word[0] == this.symbol)
-		this.optionsMatch()
+      this.toggleOptionList(this.wordAtCursor.word.length && this.wordAtCursor.word[0] == this.symbol)
+		this.showHideOptions()
    }
 
 	/**
 	* Show/Hide the options list
 	* @param {Boolean} toggle - show or hide
 	*/
-	toggleOptions(toggle) {
+	toggleOptionList(toggle) {
       this.html.optionsList.classList.remove('show')
       if(toggle) this.html.optionsList.classList.add('show')
       this.showingOptions = toggle
@@ -173,12 +180,11 @@ class Mention {
 	/**
 	* Loop the options and show/hide options based on match function
 	*/
-	optionsMatch() {
+	showHideOptions() {
       for(var option in this.options) {
-         var word = this.wordAtCursor.word.replace('@', '')
+         var word = this.wordAtCursor.word.replace(this.symbol, '')
          this.html.options[option].classList.remove('show')
-
-         if(this.match(word, this.options[option])) this.html.options[option].classList.add('show')
+         if(this.startsWith(word, this.options[option])) this.html.options[option].classList.add('show')
       }
    }
 
@@ -191,7 +197,7 @@ class Mention {
          return e.classList.contains('show')
       })
       if(!viewableOptions.length){
-         this.toggleOptions(false)
+         this.toggleOptionList(false)
          return
       }
 
@@ -208,33 +214,6 @@ class Mention {
    setCursorPosition(position) {
       this.cursorPosition = position
       this.html.input.setSelectionRange(position, position);
-   }
-
-
-   /**
-	* Loops over the input value.
-   * @return {match[]} - Array of matches { word: word, index: index word is at}
-	*/
-   findMatches() {
-      var inputValue = this.html.input.value.split('').concat([' '])
-      var words = []
-
-      var currentWord = ''
-      for(var index in inputValue) {
-         var letter = inputValue[index]
-         var lastLetter = inputValue[index-1] || ' '
-         var lastLetterIsSpace = [' ', '\\n'].indexOf(lastLetter) > -1 || lastLetter.charCodeAt(0) == 10
-         var canStartWord = letter.includes(this.symbol) && lastLetterIsSpace
-
-         if((canStartWord || currentWord.length) && letter != ' ') currentWord += letter
-
-         if(currentWord.length && (letter == ' ')){
-            words.unshift({ word: currentWord, index: Math.max(index-currentWord.length, 0) })
-            currentWord = ''
-         }
-      }
-
-      return words
    }
 
    /**
@@ -260,6 +239,43 @@ class Mention {
 
       return { index: Math.max(index-word.length, 0), word: word }
    }
+
+	/**
+	* Loops over the input value.
+	* @return {matches[]} - Array of matches { word: word, index: index word is at}
+	*/
+	findMatches() {
+		var inputValue = this.html.input.value.split('').concat([' '])
+		var words = []
+
+		var currentWord = ''
+		for(var index in inputValue) {
+			var letter = inputValue[index]
+			var lastLetter = inputValue[index-1] || ' '
+			var lastLetterIsSpace = [' ', '\\n'].indexOf(lastLetter) > -1 || lastLetter.charCodeAt(0) == 10
+			var canStartWord = letter == this.symbol && lastLetterIsSpace
+
+			if((canStartWord || currentWord.length) && letter != ' ') currentWord += letter
+
+			if(currentWord.length && letter == ' '){
+				words.push({ word: currentWord, index: Math.max(index-currentWord.length, 0) })
+				currentWord = ''
+			}
+		}
+
+		return words;
+	}
+
+	/**
+	* Collects all the real matches
+	*/
+	collect() {
+		return this.findMatches().filter((word) => {
+			return this.options.some((option) => {
+				return this.match(word.word.replace(this.symbol, ''), option)
+			})
+		})
+	}
 }
 
 if(typeof module != 'undefined') module.exports = Mention

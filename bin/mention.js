@@ -20,7 +20,6 @@ var Mention = function () {
    function Mention(settings) {
       _classCallCheck(this, Mention);
 
-      var that = this;
       this.options = settings.options || [];
       this.input = settings.input;
       this.reverse = settings.reverse;
@@ -34,6 +33,7 @@ var Mention = function () {
       this.update = settings.update || function () {};
       this.match = settings.match || this.match;
       this.template = settings.template || this.template;
+      this.startsWith = settings.startsWith || this.startsWith;
       this.html = {
          input: undefined,
          display: undefined,
@@ -57,7 +57,21 @@ var Mention = function () {
       key: 'match',
       value: function match(word, option) {
          var optionText = option.name || option;
-         return !word.length || optionText.toLowerCase().startsWith(word.replace('@', '').toLowerCase());
+         return optionText.toLowerCase() == word.toLowerCase();
+      }
+
+      /**
+      * Called to see if option starts with the word
+      * @param {String} [word] - The current word ex. @test
+      * @param {String} [option] - The options being looped
+      * @return {boolean} - If the word starts with the option
+      */
+
+   }, {
+      key: 'startsWith',
+      value: function startsWith(word, option) {
+         var optionText = option.name || option;
+         return optionText.toLowerCase().startsWith(word.toLowerCase());
       }
 
       /**
@@ -208,13 +222,9 @@ var Mention = function () {
          this.html.input.value = splitInputValue.join('');
          this.html.input.focus();
          this.setCursorPosition(this.wordAtCursor.index + word.length + 1);
-         this.toggleOptions(false);
+         this.toggleOptionList(false);
          this.update();
       }
-   }, {
-      key: 'onEventScroll',
-      value: function onEventScroll() {}
-      //this.html.display.style.top = -this.html.textWrapper.scrollTop + 'px'
 
       /**
       * Cursor position changed. Check for input data and toggle options
@@ -225,8 +235,8 @@ var Mention = function () {
       value: function cursorPositionChanged() {
          this.cursorPosition = this.html.input.selectionStart;
          this.wordAtCursor = this.readWordAtCursor({ cursorPosition: this.cursorPosition, value: this.input.value });
-         this.toggleOptions(this.wordAtCursor.word.length && this.wordAtCursor.word[0] == this.symbol);
-         this.optionsMatch();
+         this.toggleOptionList(this.wordAtCursor.word.length && this.wordAtCursor.word[0] == this.symbol);
+         this.showHideOptions();
       }
 
       /**
@@ -235,8 +245,8 @@ var Mention = function () {
       */
 
    }, {
-      key: 'toggleOptions',
-      value: function toggleOptions(toggle) {
+      key: 'toggleOptionList',
+      value: function toggleOptionList(toggle) {
          this.html.optionsList.classList.remove('show');
          if (toggle) this.html.optionsList.classList.add('show');
          this.showingOptions = toggle;
@@ -247,13 +257,12 @@ var Mention = function () {
       */
 
    }, {
-      key: 'optionsMatch',
-      value: function optionsMatch() {
+      key: 'showHideOptions',
+      value: function showHideOptions() {
          for (var option in this.options) {
-            var word = this.wordAtCursor.word.replace('@', '');
+            var word = this.wordAtCursor.word.replace(this.symbol, '');
             this.html.options[option].classList.remove('show');
-
-            if (this.match(word, this.options[option])) this.html.options[option].classList.add('show');
+            if (this.startsWith(word, this.options[option])) this.html.options[option].classList.add('show');
          }
       }
 
@@ -269,7 +278,7 @@ var Mention = function () {
             return e.classList.contains('show');
          });
          if (!viewableOptions.length) {
-            this.toggleOptions(false);
+            this.toggleOptionList(false);
             return;
          }
 
@@ -293,35 +302,6 @@ var Mention = function () {
       value: function setCursorPosition(position) {
          this.cursorPosition = position;
          this.html.input.setSelectionRange(position, position);
-      }
-
-      /**
-      * Loops over the input value.
-      * @return {match[]} - Array of matches { word: word, index: index word is at}
-      */
-
-   }, {
-      key: 'findMatches',
-      value: function findMatches() {
-         var inputValue = this.html.input.value.split('').concat([' ']);
-         var words = [];
-
-         var currentWord = '';
-         for (var index in inputValue) {
-            var letter = inputValue[index];
-            var lastLetter = inputValue[index - 1] || ' ';
-            var lastLetterIsSpace = [' ', '\\n'].indexOf(lastLetter) > -1 || lastLetter.charCodeAt(0) == 10;
-            var canStartWord = letter.includes(this.symbol) && lastLetterIsSpace;
-
-            if ((canStartWord || currentWord.length) && letter != ' ') currentWord += letter;
-
-            if (currentWord.length && letter == ' ') {
-               words.unshift({ word: currentWord, index: Math.max(index - currentWord.length, 0) });
-               currentWord = '';
-            }
-         }
-
-         return words;
       }
 
       /**
@@ -350,6 +330,51 @@ var Mention = function () {
          }
 
          return { index: Math.max(index - word.length, 0), word: word };
+      }
+
+      /**
+      * Loops over the input value.
+      * @return {matches[]} - Array of matches { word: word, index: index word is at}
+      */
+
+   }, {
+      key: 'findMatches',
+      value: function findMatches() {
+         var inputValue = this.html.input.value.split('').concat([' ']);
+         var words = [];
+
+         var currentWord = '';
+         for (var index in inputValue) {
+            var letter = inputValue[index];
+            var lastLetter = inputValue[index - 1] || ' ';
+            var lastLetterIsSpace = [' ', '\\n'].indexOf(lastLetter) > -1 || lastLetter.charCodeAt(0) == 10;
+            var canStartWord = letter == this.symbol && lastLetterIsSpace;
+
+            if ((canStartWord || currentWord.length) && letter != ' ') currentWord += letter;
+
+            if (currentWord.length && letter == ' ') {
+               words.push({ word: currentWord, index: Math.max(index - currentWord.length, 0) });
+               currentWord = '';
+            }
+         }
+
+         return words;
+      }
+
+      /**
+      * Collects all the real matches
+      */
+
+   }, {
+      key: 'collect',
+      value: function collect() {
+         var _this2 = this;
+
+         return this.findMatches().filter(function (word) {
+            return _this2.options.some(function (option) {
+               return _this2.match(word.word.replace(_this2.symbol, ''), option);
+            });
+         });
       }
    }]);
 
