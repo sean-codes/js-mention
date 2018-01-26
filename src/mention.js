@@ -62,9 +62,9 @@ class Mention {
 	*/
 	setupHTML() {
       this.html.input = this.input
-      var computedStyleInput = window.getComputedStyle(this.html.input, "")
+      var computedStyleInput = window.getComputedStyle(this.html.input, null)
       var styleInput = (prop) => { return computedStyleInput.getPropertyValue(prop) }
-      var numStyleInput = (prop) => { return parseInt(styleInput(prop)) }
+      var numStyleInput = (prop) => { return parseInt(styleInput(prop)) || 0 }
 
       // Global wrapper
       this.html.wrapper = document.createElement('div')
@@ -89,7 +89,7 @@ class Mention {
       if(/iPhone|iPad|iPod|Edge/i.test(navigator.userAgent)){
          this.html.display.style.paddingLeft = numStyleInput('padding-top') + numStyleInput('border-width') + 3 + 'px'
          if(navigator.userAgent.includes('Edge')){
-            this.html.display.style.paddingTop = numStyleInput('padding-top') + numStyleInput('border-width') + 3 + 'px'
+            //this.html.display.style.paddingTop = numStyleInput('padding-top') + numStyleInput('border-width') + 3 + 'px'
          }
       }
       this.html.display.style.wordBreak = 'break-word'
