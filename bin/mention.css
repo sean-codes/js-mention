@@ -5,6 +5,8 @@
     overflow: auto;
     position: relative; }
     .mention-wrapper .mention-textwrapper textarea {
+      border-radius: 0px;
+      margin: 0px;
       resize: none;
       float: left; }
   .mention-wrapper .mention-options {

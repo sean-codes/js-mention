@@ -69,7 +69,7 @@ class Mention {
       // Global wrapper
       this.html.wrapper = document.createElement('div')
       this.html.wrapper.classList.add('mention-wrapper')
-      this.html.wrapper.style.width = computedStyleInput.getPropertyValue('width')
+      this.html.wrapper.style.width = styleInput('width')
       this.html.input.parentElement.insertBefore(this.html.wrapper, this.html.input)
 
       // Text/Display Wrapper
@@ -82,15 +82,6 @@ class Mention {
       this.html.display.classList.add('mention-display')
       this.html.textWrapper.appendChild(this.html.input)
       this.html.textWrapper.appendChild(this.html.display)
-      for(var prop in computedStyleInput){
-         try { this.html.display.style[prop] = computedStyleInput[prop] } catch(e) { }
-      }
-      if(/iPhone|iPad|iPod|Edge/i.test(navigator.userAgent)){
-         this.html.display.style.paddingLeft = parseInt(computedStyleInput.getPropertyValue('padding-left')) + 3 + 'px'
-         if(navigator.userAgent.includes('Edge')){
-            this.html.display.style.paddingTop = parseInt(computedStyleInput.getPropertyValue('padding-top')) + 3 + 'px'
-         }
-      }
       this.html.display.style.padding = numStyleInput('padding-top') + numStyleInput('border-width') + 'px'
       this.html.display.style.wordBreak = 'break-word'
       this.html.display.style.wordWrap = 'break-word'
@@ -103,6 +94,15 @@ class Mention {
       this.html.display.style.width = '100%';
       this.html.input.style.width = '100%'
       this.html.display.style.height = 'fit-content'
+      for(var prop in computedStyleInput){
+         try { this.html.display.style[prop] = computedStyleInput[prop] } catch(e) { }
+      }
+      if(/iPhone|iPad|iPod|Edge/i.test(navigator.userAgent)){
+         this.html.display.style.paddingLeft = numStyleInput('padding-left') + 3 + 'px'
+         if(navigator.userAgent.includes('Edge')){
+            this.html.display.style.paddingTop = numStyleInput('padding-top') + 3 + 'px'
+         }
+      }
 
       // Options
       this.html.optionsList = document.createElement('div')
