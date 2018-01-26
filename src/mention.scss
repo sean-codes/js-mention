@@ -6,8 +6,9 @@
       overflow:auto;
       position:relative;
       textarea {
-			overflow:hidden;
+			ccoverflow:hidden;
          border-radius:0px;
+         margin:0px;
          resize:none;
          float:left;
       }

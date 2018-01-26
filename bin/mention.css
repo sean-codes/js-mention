@@ -5,6 +5,7 @@
     overflow: auto;
     position: relative; }
     .mention-wrapper .mention-textwrapper textarea {
+      ccoverflow: hidden;
       border-radius: 0px;
       margin: 0px;
       resize: none;
