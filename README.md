@@ -3,7 +3,7 @@
 
 ![example](https://github.com/sean-codes/js-mention/blob/master/js-mention.gif?raw=true)
 
-Demo: [demo](https://sean-codes.github.io/js-mention/demo/)
+Demo: [demo](https://sean-codes.github.io/js-mention/demo/reversed.html)
 
 
 ## Include:
@@ -42,14 +42,14 @@ When defining the mention object add update function
     ...
     ,
     update: function() {
-       dconsole.log(this.collect())
+       console.log(this.collect())
     }
   })
 ```
 
 ### Option display template
 
-When defining the mention object add template function. 
+When defining the mention object add template function.
 ```js
   var myMention = new Mention({
     ...
@@ -62,7 +62,7 @@ When defining the mention object add template function.
 
 ### Match / Search function
 
-When defining the mention object add match function. 
+When defining the mention object add match function.
 ```js
   var myMention = new Mention({
     ...
@@ -73,4 +73,3 @@ When defining the mention object add match function.
     }
   })
 ```
-
