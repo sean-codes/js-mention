@@ -17,7 +17,7 @@ Demo: [demo](https://sean-codes.github.io/js-mention/demo/reversed.html)
 
 ```js
   var myMention = new Mention({
-      selector: '#myTextArea',
+      input: document.getElementById('myTextArea'),
       options: [
          { name: 'WideEye' },
          { name: 'LiquidLuck' },
