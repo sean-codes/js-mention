@@ -26,7 +26,7 @@
     "gulp-uglify": "^3.0.0",
     "tap-spec": "^4.1.1",
     "tape": "^4.8.0",
-    "tape-run": "^3.0.1"
+    "tape-run": "^10.0.0"
   },
   "dependencies": {
     "gulp-rename": "^1.2.2"
